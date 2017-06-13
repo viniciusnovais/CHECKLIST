@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:id="@+id/linearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="Progresso: "/>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="150dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="3dp"
+            android:progress="0"
+            android:layout_gravity="center"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            />
+
+        <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textBar"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+        />
+
+
+
+        <TextView
+            android:layout_marginTop="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" / "
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:id="@+id/textMax"
+            />
+
+    </LinearLayout>
+
+    <RelativeLayout
+    android:layout_width="wrap_content"
+    android:layout_height="0dp"
+    android:layout_marginTop="20dp"
+    android:layout_weight=".7">
+    <RelativeLayout
+    android:layout_width="fill_parent"
+        android:layout_marginTop="150dp"
+    android:layout_height="wrap_content"
+        android:gravity="center_vertical">
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="70dp"
+            android:src="@drawable/ic_preview"
+            android:id="@+id/arrowLeft"
+            />
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="70dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_next"
+            android:id="@+id/arrowRight" />
+    </RelativeLayout>
+
+    <br.com.pdasolucoes.checklist.util.CustomRecyclerView
+        android:id="@+id/rv_list"
+        android:scrollbars="vertical"
+        android:dividerHeight="0dp"
+        android:divider="@null"
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="35dp"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent" />
+
+</RelativeLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="5dp"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="center">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true">
+
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_weight=".5"
+            android:layout_height="64dp"
+            android:background="@drawable/border_button_home"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/help"
+            android:src="@drawable/help"/>
+
+        <!-- layout Camera-->
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight=".6"
+            android:layout_height="64dp">
+
+            <!--imagem camera-->
+
+            <ImageButton
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_weight=".5"
+                android:id="@+id/camera"
+                android:src="@drawable/camera"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/border_button_home"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:textSize="15dp"
+                android:visibility="gone"
+                android:background="@drawable/border_alerta"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:layout_marginLeft="50dp"
+                android:id="@+id/numeroNotificaCamera"
+                android:text="05"/>
+
+        </RelativeLayout>
+
+        <!--layout comentário-->
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight=".6"
+            android:layout_height="64dp">
+
+        <!--imagem comentario-->
+
+        <ImageButton
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_weight=".5"
+            android:id="@+id/comment"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/border_button_home"
+            android:layout_alignParentBottom="true"
+            android:src="@drawable/comment"/>
+
+                <TextView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:textSize="15dp"
+                    android:background="@drawable/border_alerta"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:layout_marginLeft="50dp"
+                    android:visibility="gone"
+                    android:id="@+id/numeroNotificaComment"
+                    android:text="05"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight=".6"
+            android:layout_height="64dp">
+
+
+        <ImageButton
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:id="@+id/imagetoDo"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/border_button_home"
+            android:src="@drawable/todo_48_gray"
+            android:layout_alignParentBottom="true"
+
+            />
+
+            <TextView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:textSize="15dp"
+                android:textColor="@color/black"
+                android:textAlignment="center"
+                android:visibility="gone"
+                android:background="@drawable/border_alerta"
+                android:layout_marginLeft="50dp"
+                android:id="@+id/numeroNotificaTodo"
+                android:text="05"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight=".6"
+            android:layout_height="64dp">
+
+
+        <ImageButton
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_weight=".5"
+            android:id="@+id/bell"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/border_button_home"
+            android:layout_alignParentBottom="true"
+            android:src="@drawable/bell"
+            />
+
+                <TextView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:textSize="15dp"
+                    android:textAlignment="center"
+                    android:background="@drawable/border_alerta"
+                    android:textColor="@color/black"
+                    android:layout_marginLeft="50dp"
+                    android:visibility="gone"
+                    android:id="@+id/numeroNotificaNotify"
+                    android:text="05"/>
+        </RelativeLayout>
+    </LinearLayout>
+
+        <!--<LinearLayout-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:layout_marginRight="5dp"-->
+            <!--android:layout_alignParentBottom="true"-->
+            <!--android:layout_gravity="center">-->
+            <!--<TextView-->
+                <!--android:layout_marginTop="5dp"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentBottom="true"-->
+                <!--android:layout_marginLeft="15dp"-->
+                <!--android:text="Ajuda"/>-->
+
+            <!--<TextView-->
+                <!--android:layout_marginTop="5dp"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_alignParentBottom="true"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginLeft="25dp"-->
+                <!--android:text="Camera"/>-->
+
+            <!--<TextView-->
+                <!--android:layout_marginTop="7dp"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentBottom="true"-->
+                <!--android:layout_marginLeft="15dp"-->
+                <!--android:text="Comentário"-->
+                <!--android:id="@+id/textView6" />-->
+
+            <!--<TextView-->
+                <!--android:layout_marginTop="7dp"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginLeft="20dp"-->
+                <!--android:text="TO DO"-->
+                <!--android:id="@+id/textView7" />-->
+
+            <!--<TextView-->
+                <!--android:layout_marginTop="7dp"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginLeft="20dp"-->
+                <!--android:layout_alignParentBottom="true"-->
+                <!--android:text="Notifica"-->
+                <!--android:id="@+id/textView" />-->
+
+        <!--</LinearLayout>-->
+    </LinearLayout>
+</LinearLayout>

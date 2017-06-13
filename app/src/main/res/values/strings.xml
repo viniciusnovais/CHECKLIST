@@ -1,0 +1,64 @@
+<resources>
+    <string name="app_name">Forms</string>
+    <string name="login">LOGIN</string>
+    <string name="home">HOME</string>
+    <string name="email">EMAIL</string>
+    <string name="password">SENHA</string>
+    <string name="login_in">Login</string>
+    <string name="send">Enviar</string>
+    <string name="forgetPassword"><u>Esqueci minha senha</u></string>
+    <string name="forms">Forms</string>
+    <string name="by">by PDA Soluções- Verificy Solution</string>
+    <string name="welcome">Bem-Vindo</string>
+    <string name="logout">LOGOUT</string>
+    <string name="logouti">LOGOUT ?</string>
+    <string name="yes">SIM</string>
+    <string name="no">NÃO</string>
+    <string name="form">Form</string>
+    <string name="site">Site</string>
+    <string name="data">Data</string>
+    <string name="periodo">Período</string>
+    <string name="status">Status</string>
+    <string name="sinc">SYNC</string>
+    <string name="pdaemail"><u>support@pdasolucoes.com.br</u></string>
+    <string name="rde_mais">RDE</string>
+    <string name="rde_menos">RDE</string>
+    <string name="rfe_mais">RFE</string>
+    <string name="rfe_menos">RFE</string>
+    <string name="ade_mais">ADE</string>
+    <string name="ade_menos">ADE</string>
+    <string name="afe_mais">AFE</string>
+    <string name="afe_menos">AFE</string>
+    <string name="general">GERAL</string>
+    <string name="time">Tempo</string>
+    <string name="indicator">INDICADOR</string>
+    <string name="msg">Por favor, Permita todos</string>
+    <string name="facebook_app_id">1433416803335169</string>
+    <string name="opcoes">Opções</string>
+    <string name="galeria">Galeria</string>
+    <string name="camera">Câmera</string>
+    <string name="starting">Inicializando</string>
+    <string name="msg_password">Olá, Digite seu email para enviarmos uma senha para você, ou entre em contato
+    conosco.</string>
+    <string name="descricao">Desc</string>
+    <string name="salvar">Salvar</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="comente">Comente:</string>
+    <string name="limpar">limpar</string>
+
+    <string name="status_prompt">Selecione</string>
+    <string name="nomeForm">Nome Formulário:</string>
+    <string name="codigo">Código do Formulário:</string>
+    <string name="formulario">Form</string>
+    <string name="estatistica">ESTATÍSTICA</string>
+    <string name="carregando">Carregando...</string>
+    <string name="tituloPergunta">Título da pergunta:</string>
+    <string name="resposta_nao_conforme">Resposta não conforme:</string>
+
+    <string-array name="status_todo">
+        <item>Concluído</item>
+        <item>Andamento</item>
+        <item>Agendado</item>
+    </string-array>
+
+</resources>
