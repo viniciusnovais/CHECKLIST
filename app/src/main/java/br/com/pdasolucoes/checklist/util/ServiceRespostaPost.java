@@ -1,10 +1,17 @@
 package br.com.pdasolucoes.checklist.util;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -26,10 +33,14 @@ public class ServiceRespostaPost {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("idResposta", r.getIdResposta());
         jsonObject.put("txtResposta", r.getTxtResposta());
-        jsonObject.put("idPergunta", r.getIdPergunta());
+        jsonObject.put("idPergunta", r.getIdPergunta().getIdPergunta());
         jsonObject.put("idFormItem", r.getIdFormItem());
         jsonObject.put("idOpcao", r.getIdOpcao());
         jsonObject.put("idTodo", r.getTodo());
+//        String encodedImage = Base64.encodeToString(image, Base64.DEFAULT);
+//        jsonObject.put("imageResposta",encodedImage);
+
+
 
         try {
             URL url = new URL(WebService.URL_SHEETS + "f541bc46cf58");
@@ -66,5 +77,6 @@ public class ServiceRespostaPost {
             e.printStackTrace();
         }
     }
+
 
 }

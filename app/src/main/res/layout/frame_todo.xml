@@ -10,6 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginTop="10dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -61,7 +62,8 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight=".6"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
@@ -81,7 +83,8 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
+                    android:layout_weight=".4"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="24dp"
                     android:layout_marginRight="20dp"
@@ -113,7 +116,8 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight=".3"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
@@ -129,19 +133,14 @@
                         android:layout_width="50dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
+                        android:hint="dias"
                         android:background="@color/white"
                         android:inputType="number" />
                 </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="3dp"
-                    android:layout_marginTop="35dp"
-                    android:text="DIAS" />
-
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight=".3"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
@@ -149,15 +148,15 @@
                         android:id="@+id/textView2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="20dp"
+                        android:layout_marginLeft="10dp"
                         android:layout_marginTop="10dp"
-                        android:text="DATA LIMITE" />
+                        android:text="D.LIMITE" />
 
                     <EditText
                         android:id="@+id/editData"
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="20dp"
+                        android:layout_marginLeft="10dp"
                         android:background="@color/white"
                         android:focusable="false"
                         android:inputType="date"
@@ -165,7 +164,8 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
+                    android:layout_weight=".4"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"

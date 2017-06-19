@@ -15,11 +15,11 @@
     <string name="yes">SIM</string>
     <string name="no">NÃO</string>
     <string name="form">Form</string>
-    <string name="site">Site</string>
+    <string name="site">Local</string>
     <string name="data">Data</string>
-    <string name="periodo">Período</string>
+    <string name="periodo">Perí.</string>
     <string name="status">Status</string>
-    <string name="sinc">SYNC</string>
+    <string name="sinc">Sync</string>
     <string name="pdaemail"><u>support@pdasolucoes.com.br</u></string>
     <string name="rde_mais">RDE</string>
     <string name="rde_menos">RDE</string>
@@ -54,6 +54,7 @@
     <string name="carregando">Carregando...</string>
     <string name="tituloPergunta">Título da pergunta:</string>
     <string name="resposta_nao_conforme">Resposta não conforme:</string>
+    <string name="sync">Sync</string>
 
     <string-array name="status_todo">
         <item>Concluído</item>

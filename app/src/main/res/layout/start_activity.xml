@@ -87,7 +87,7 @@
                     android:id="@+id/editSite"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="30dp"
+                    android:layout_marginLeft="16dp"
                     android:background="@color/whiteSame"
                     android:focusable="false" />
 
@@ -115,7 +115,7 @@
                     android:id="@+id/editData"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginLeft="21dp"
                     android:background="@color/white"
                     android:focusable="false" />
 

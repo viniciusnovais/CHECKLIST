@@ -15,6 +15,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -29,6 +30,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import br.com.pdasolucoes.checklist.adapter.Question2Adapter;
 import br.com.pdasolucoes.checklist.dao.ComplementoRespostaDao;
@@ -495,25 +497,56 @@ public class QuestionsActivity extends AppCompatActivity {
 
     }
 
-    public class AsyncPergunta extends AsyncTask {
+    public class AsyncPergunta extends AsyncTask<Objects, Integer, Integer> {
+
 
         @Override
-        protected Object doInBackground(Object[] objects) {
+        protected void onPreExecute() {
+            super.onPreExecute();
+
             if (VerificaConexao.isNetworkConnected(QuestionsActivity.this)) {
-                listaPergunta = new ArrayList<>();
-                listaPergunta = dao.getPerguntaWS();
-                dao.incluir(listaPergunta);
-//            }else{
-//                listaPergunta=new ArrayList<>();
-//                listaPergunta=dao.listar(getIntent().getExtras().getInt("id"));
+                Log.w("progreas", "start");
+                new Thread(new Runnable() {
+                    public void run() {
+                        progressStatus = doSomeWork();
+                        handler.post(new Runnable() {
+                            public void run() {
+                                dialogProgress.show();
+                                progressBar.setProgress(progressStatus);
+                            }
+                        });
+                    }
+
+                private int doSomeWork() {
+                    try {
+                        // ---simulate doing some work---
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    return ++progress;
+                }
+                }).start();
             }
 
-            return null;
         }
 
         @Override
-        protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
+        protected Integer doInBackground(Objects... objectses) {
+
+            if (VerificaConexao.isNetworkConnected(QuestionsActivity.this)) {
+                listaPergunta = new ArrayList<>();
+                listaPergunta = dao.getPerguntaWS(getIntent().getExtras().getInt("idForm"));
+                dao.incluir(listaPergunta);
+            }
+
+            return 1;
+        }
+
+
+        @Override
+        protected void onPostExecute(Integer progres) {
+            super.onPostExecute(progres);
 
             mRecyclerView = (CustomRecyclerView) findViewById(R.id.rv_list);
 
@@ -522,12 +555,12 @@ public class QuestionsActivity extends AppCompatActivity {
 
             if (getIntent().hasExtra("StartActivity") == true) {
                 Form f = new Form();
-                f.setIdForm(getIntent().getExtras().getInt("id"));
+                f.setIdForm(getIntent().getExtras().getInt("idForm"));
                 f.setNomeFom(getIntent().getExtras().getString("nomeForm"));
                 formItem.setIdForm(f);
                 daoItemForm.incluir(formItem);
 
-                adapter = new Question2Adapter(QuestionsActivity.this, dao.listar(getIntent().getExtras().getInt("id")), daoItemForm.buscarMaxId());
+                adapter = new Question2Adapter(QuestionsActivity.this, dao.listar(getIntent().getExtras().getInt("idForm")), daoItemForm.buscarMaxId());
                 mRecyclerView.setAdapter(adapter);
 
             } else {
@@ -570,36 +603,10 @@ public class QuestionsActivity extends AppCompatActivity {
                 }
             });
 
-            if (dialogProgress.isShowing()) {
+            if (progres == 1) {
                 dialogProgress.dismiss();
             }
-        }
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            new Thread(new Runnable() {
-                public void run() {
-                    progressStatus = doSomeWork();
-                    handler.post(new Runnable() {
-                        public void run() {
-                            dialogProgress.show();
-                            progressBar.setProgress(progressStatus);
-                        }
-                    });
-                }
-
-                private int doSomeWork() {
-                    try {
-                        // ---simulate doing some work---
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    return ++progress;
-                }
-            }).start();
         }
     }
 

@@ -1,127 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginRight="16dp"
+    android:layout_marginLeft="16dp"
+    android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginRight="12dp"
-
-        android:layout_marginLeft="12dp"
-        android:layout_marginTop="20dp">
-
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tvForm"
-            android:textSize="18dp"
-            android:text="@string/form"/>
-        <Spinner
-            android:id="@+id/spinnerForm"
-            android:layout_width="100dp"
-            android:layout_height="25dp"
-            android:background="@drawable/border_appointmentbook"
-            android:layout_marginLeft="16dp"/>
-        <TextView
-            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvForm"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/form"
+                    android:textSize="18dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerForm"
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp"
+                    android:layout_marginLeft="5dp"
+                    android:background="@drawable/border_appointmentbook" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvPeriodo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/periodo"
+                    android:textSize="18dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerPeriodo"
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp"
+                    android:layout_marginLeft="7dp"
+                    android:background="@drawable/border_appointmentbook" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/periodo"
-            android:textSize="18dp"
-            android:id="@+id/tvPeriodo"
-            android:layout_marginLeft="16dp"/>
-        <Spinner
-            android:id="@+id/spinnerPeriodo"
-            android:layout_width="100dp"
-            android:layout_height="25dp"
-            android:background="@drawable/border_appointmentbook"
-            android:layout_marginLeft="10dp"/>
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvSite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/site"
+                    android:textSize="18dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerSite"
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp"
+                    android:layout_marginLeft="5dp"
+                    android:background="@drawable/border_appointmentbook" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvSync"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/sinc"
+                    android:textSize="18dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerSync"
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp"
+                    android:layout_marginLeft="5dp"
+                    android:background="@drawable/border_appointmentbook" />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginRight="12dp"
-        android:layout_marginLeft="12dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="18dp"
-            android:textSize="18dp"
-            android:id="@+id/tvSite"
-            android:text="@string/site"/>
-
-        <Spinner
-            android:layout_width="100dp"
-            android:layout_height="25dp"
-            android:background="@drawable/border_appointmentbook"
-            android:layout_marginLeft="10dp"
-            android:id="@+id/spinnerSite" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="18dp"
-            android:textSize="18dp"
-            android:id="@+id/tvSync"
-            android:text="@string/sinc"/>
-
-        <Spinner
-            android:id="@+id/spinnerSync"
-            android:layout_width="100dp"
-            android:layout_height="25dp"
-            android:background="@drawable/border_appointmentbook"
-            android:layout_marginLeft="30dp"/>
-    </LinearLayout>
-    </LinearLayout>
     <ListView
         android:id="@+id/listViewSync"
-        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:dividerHeight="0dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight=".7"
         android:divider="@null"
-        android:layout_weight=".7">
+        android:dividerHeight="0dp">
 
-        </ListView>
+    </ListView>
+
     <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
         android:id="@+id/load"
-        android:layout_gravity="center_horizontal|center_vertical">
-    <ProgressBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:visibility="gone">
 
-        android:indeterminate="true" />
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:indeterminate="true" />
     </RelativeLayout>
 
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight=".1"
-        android:text="@string/sinc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sync"
+        android:layout_gravity="center"
         android:gravity="left|center"
-        android:paddingLeft="35dp"
+        android:paddingRight="40dp"
+        android:paddingLeft="40dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
         android:drawablePadding="10dp"
         android:drawableLeft="@drawable/play"
-        android:layout_marginRight="100dp"
-        android:layout_marginLeft="100dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:background="@drawable/border_button_logout"
+        android:background="@drawable/border_button_home"
         android:id="@+id/buttonSync" />
 
 </LinearLayout>
