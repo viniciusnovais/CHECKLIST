@@ -37,7 +37,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE if not exists resposta(_idResposta INTEGER PRIMARY KEY, " +
                 "txtResposta TEXT,idPergunta INTEGER, idFormItem INTEGER, idOpcao INTEGER, todo INTEGER)");
 
-        db.execSQL("CREATE TABLE if not exists formItem(_idFormItem INTEGER PRIMARY KEY AUTOINCREMENT,status INTEGER, idForm INTEGER, FOREIGN KEY(idForm) REFERENCES form(_idForm))");
+        db.execSQL("CREATE TABLE if not exists formItem(_idFormItem INTEGER PRIMARY KEY AUTOINCREMENT,status INTEGER,sync INTEGER, idForm INTEGER, FOREIGN KEY(idForm) REFERENCES form(_idForm))");
 
         db.execSQL("CREATE TABLE if not exists complementoResposta(_idComplemento INTEGER PRIMARY KEY, image BLOB, comentario TEXT, " +
                 "idPergunta INTEGER, idFormItem INTEGER)");

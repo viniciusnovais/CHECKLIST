@@ -103,8 +103,8 @@ public class PerguntaDao {
     }
 
 
-    public List<Pergunta> getPerguntaWS() {
-        String url = WebService.URL_SHEETS + "ebcb036a601a";
+    public List<Pergunta> getPerguntaWS(int idForm) {
+        String url = WebService.URL_SHEETS + "ebcb036a601a/search?idForm="+idForm;
         String resposta = WebService.makeRequest(url);
         JSONObject jsonObject;
         List<Pergunta> lista = new ArrayList<>();

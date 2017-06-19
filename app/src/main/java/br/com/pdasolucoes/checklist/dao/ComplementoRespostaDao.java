@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.pdasolucoes.checklist.model.ComplementoResposta;
@@ -48,6 +49,25 @@ public class ComplementoRespostaDao {
 
         return getDataBase().insert("complementoResposta", null, values);
 
+    }
+
+    public List<ComplementoResposta> listar(int idFormItem) {
+        List<ComplementoResposta> lista = new ArrayList<>();
+        Cursor cursor = getDataBase().rawQuery("SELECT * FROM complementoResposta cr WHERE cr.idFormItem = ? GROUP BY cr.idPergunta", new String[]{idFormItem + ""});
+        try {
+            while (cursor.moveToNext()) {
+                ComplementoResposta cr = new ComplementoResposta();
+                cr.setIdComplemento(cursor.getInt(cursor.getColumnIndex("_idComplemento")));
+                cr.setImage(cursor.getBlob(cursor.getColumnIndex("image")));
+                cr.setComentario(cursor.getString(cursor.getColumnIndex("comentario")));
+                cr.setIdPergunta(cursor.getInt(cursor.getColumnIndex("idPergunta")));
+                cr.setIdFormItem(cursor.getInt(cursor.getColumnIndex("idFormItem")));
+                lista.add(cr);
+            }
+        } finally {
+            cursor.close();
+        }
+        return lista;
     }
 
     public int contadorImagens(int idFormItem) {

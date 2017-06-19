@@ -96,7 +96,7 @@ public class StartActivity extends AppCompatActivity {
 
                 Intent i = new Intent(StartActivity.this, QuestionsActivity.class);
 
-                i.putExtra("id", idFormSpinner);
+                i.putExtra("idForm", idFormSpinner);
                 i.putExtra("nomeForm",adapterSpinner.getItem(spinnerForm.getSelectedItemPosition()).getNomeFom());
                 i.putExtra("numero", spinnerForm.getSelectedItem().toString().lastIndexOf(spinnerForm.getSelectedItem().toString().length() - 1));
                 i.putExtra("StartActivity", "StartActivity");

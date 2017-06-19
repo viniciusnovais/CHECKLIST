@@ -126,6 +126,7 @@ public class RespostaDao {
         return lista;
     }
 
+
     public int buscarIdResposta(int idFormItem, int idPergunta) {
         int id = 0;
         Cursor cursor = getDataBase().rawQuery("SELECT _idResposta FROM resposta WHERE idFormItem = ? and idPergunta = ?", new String[]{idFormItem + "", idPergunta + ""});

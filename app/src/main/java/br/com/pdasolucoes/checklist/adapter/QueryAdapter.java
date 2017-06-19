@@ -62,6 +62,8 @@ public final class QueryAdapter extends RecyclerView.Adapter<QueryAdapter.MyView
 
         if (lista.get(position).getStatus() == 0) {
             holder.imageView.setImageResource(R.drawable.exclamation);
+        }else if (lista.get(position).getStatus()==1){
+            holder.imageView.setImageResource(R.drawable.checked);
         }
 
     }

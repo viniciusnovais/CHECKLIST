@@ -45,6 +45,7 @@ public class FormItemDao {
         ContentValues values = new ContentValues();
         values.put("idForm", item.getIdForm().getIdForm());
         values.put("status",0);
+        values.put("sync",0);
         return getDataBase().insert("formItem", null, values);
     }
 
@@ -70,7 +71,7 @@ public class FormItemDao {
     public List<FormItem> listarItemFormSync(){
         List<FormItem> lista =new ArrayList<>();
         Cursor cursor = getDataBase().rawQuery(
-                "SELECT i._idFormItem, i.idForm,f.nomeForm,i.status,f.dataForm,f.nomeLoja,f.hora FROM formItem i, form f WHERE i.idForm = f._idForm and i.status=1", null);
+                "SELECT i._idFormItem, i.idForm,f.nomeForm,i.status,f.dataForm,f.nomeLoja,f.hora FROM formItem i, form f WHERE i.idForm = f._idForm and i.status=1 and i.sync=0", null);
         while (cursor.moveToNext()) {
             FormItem form = new FormItem();
             form.setIdItem(cursor.getInt(cursor.getColumnIndex("_idFormItem")));
@@ -92,6 +93,13 @@ public class FormItemDao {
     public long alterarStatus(int idFormItem){
         ContentValues values = new ContentValues();
         values.put("status",1);
+
+        return getDataBase().update("formItem",values,"_idFormItem  = ?",new String[]{idFormItem+""});
+    }
+
+    public long alterarStatusSync(int idFormItem){
+        ContentValues values = new ContentValues();
+        values.put("sync",1);
 
         return getDataBase().update("formItem",values,"_idFormItem  = ?",new String[]{idFormItem+""});
     }
