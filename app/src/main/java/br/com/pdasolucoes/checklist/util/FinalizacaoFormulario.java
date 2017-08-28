@@ -199,8 +199,14 @@ public class FinalizacaoFormulario {
 
 
         for (Pergunta p : pergunta) {
-            for (OpcaoResposta op : opcaoRespostaDao.listarTodasOpcoesForm(id, p.getIdPergunta())) {
-                totalTodasPerguntasForm += op.getValor();
+            if (p.getTipoPergunta() == 2) {
+                for (OpcaoResposta op : opcaoRespostaDao.listarTodasOpcoesForm(id, p.getIdPergunta())) {
+                    totalTodasPerguntasForm += op.getValor();
+                }
+            } else if (p.getTipoPergunta() == 4) {
+                for (OpcaoResposta op : opcaoRespostaDao.listarTodasOpcoesFormMultiplo(id, p.getIdPergunta())) {
+                    totalTodasPerguntasForm += op.getValor();
+                }
             }
             for (Resposta r : dao.respotaPeloIdPergunta(p.getIdPergunta(), id)) {
 

@@ -143,9 +143,27 @@ public class OpcaoRespostaDao {
         return lista;
     }
 
+    public List<OpcaoResposta> listarTodasOpcoesFormMultiplo(int idFormItem, int idPergunta) {
+        List<OpcaoResposta> lista = new ArrayList<>();
+        Cursor cursor = getDataBase().rawQuery("SELECT SUM(valor) as somaValor FROM opcaoQuestao op, formItem f WHERE op.idPergunta = ? and f._idFormItem = ?", new String[]{idPergunta + "", idFormItem + ""});
+        try {
+            while (cursor.moveToNext()) {
+                OpcaoResposta or = new OpcaoResposta();
+
+                or.setValor(cursor.getFloat(cursor.getColumnIndex("somaValor")));
+
+                lista.add(or);
+            }
+        } finally {
+            cursor.close();
+            //getDataBase().close();
+        }
+        return lista;
+    }
+
     public List<OpcaoResposta> listarVolta(int idFormItem, int idPergunta) {
         List<OpcaoResposta> lista = new ArrayList<>();
-        Cursor cursor = getDataBase().rawQuery("SELECT txtResposta,o._idOpcao,opcao, o.idPergunta FROM opcaoQuestao o " +
+        Cursor cursor = getDataBase().rawQuery("SELECT r.txtResposta,o._idOpcao,opcao, o.idPergunta, r.valor FROM opcaoQuestao o " +
                 "LEFT JOIN resposta r ON o.idPergunta=r.idPergunta and o._idOpcao=r.idOpcao where r.idFormItem=? and r.idPergunta= ? " +
                 "GROUP BY txtResposta,o._idOpcao,opcao, o.idPergunta", new String[]{idFormItem + "", idPergunta + ""});
         try {

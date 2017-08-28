@@ -137,10 +137,10 @@ public class ComponenteResposta {
                         //pega a resposta selecionada pelo usuario
                         resposta.setIdOpcao(opcao.get(finalCnttxtcheck1).getIdOpcao());
                         resposta.setTxtResposta(buttonView.getText().toString());
-                        Pergunta p = new Pergunta();
-                        p.setIdPergunta(idPergunta);
                         resposta.setIdPergunta(idPergunta);
                         resposta.setIdFormItem(idFormItem);
+                        resposta.setValor(opcao.get(posCheck).getValor());
+                        resposta.setTodo(opcao.get(posCheck).getToDo());
 
                         daoResposta.incluirResposta(resposta);
                         idResposta = daoResposta.buscarIdResposta(idFormItem, idPergunta);
@@ -247,8 +247,6 @@ public class ComponenteResposta {
                                 resposta.setTxtResposta(radio[pos].getText().toString());
                                 resposta.setValor(opcao.get(pos).getValor());
                                 resposta.setTodo(opcao.get(pos).getToDo());
-                                Pergunta p = new Pergunta();
-                                p.setIdPergunta(idPergunta);
                                 resposta.setIdPergunta(idPergunta);
                                 resposta.setIdFormItem(idFormItem);
 
@@ -276,12 +274,12 @@ public class ComponenteResposta {
                         });
                     }
                 });
+            }
 
 
             radioGroup.addView(radio[cntradio]);
             cntradio = cntradio + 1;
             cnttxt = cnttxt + 1;
-        }
 
         linearLayout.addView(radioGroup);
 

@@ -206,23 +206,6 @@ public class StartActivity extends AppCompatActivity {
         @Override
         protected Object doInBackground(Object[] objects) {
 
-            SharedPreferences preferences = getSharedPreferences("MainActivityPreferences", MODE_PRIVATE);
-
-            if (VerificaConexao.isNetworkConnected(StartActivity.this)) {
-                listForm = dao.listarForms(preferences.getInt("idConta", 0));
-
-                listaInt = new ArrayList<>();
-                listaSetor = new ArrayList<>();
-                for (Form f : listForm) {
-                    listaInt.add(f.getIdForm());
-                    listaSetor = setorDao.listaWeb(f.getIdForm());
-                    setorDao.incluir(listaSetor);
-                }
-
-                dao.deleteForm(listaInt);
-            } else {
-                listForm = dao.listar();
-            }
             return null;
         }
 
@@ -230,12 +213,10 @@ public class StartActivity extends AppCompatActivity {
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
 
-            dao.incluir(listForm);
-
             //adiicionando forms na lista de spinner
             adapterSpinner = new SpinnerAdapterForm(
                     StartActivity.this,
-                    R.layout.custom_spinner_start, listForm);
+                    R.layout.custom_spinner_start, dao.listar());
 
             adapterSpinner.setDropDownViewResource(R.layout.spinner_item_start);
             spinnerForm.setAdapter(adapterSpinner);

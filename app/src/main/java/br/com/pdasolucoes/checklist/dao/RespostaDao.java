@@ -85,10 +85,8 @@ public class RespostaDao {
             while (cursor.moveToNext()) {
                 Resposta r = new Resposta();
                 r.setIdResposta(cursor.getInt(cursor.getColumnIndex("_idResposta")));
-                r.setTxtResposta(cursor.getString(cursor.getColumnIndex("txtResposta")));
-//                Pergunta p =  new Pergunta();
-//                p.setIdPergunta(cursor.getInt(cursor.getColumnIndex("idPergunta")));
                 r.setIdPergunta(cursor.getInt(cursor.getColumnIndex("idPergunta")));
+                r.setTxtResposta(cursor.getString(cursor.getColumnIndex("txtResposta")));
                 r.setIdFormItem(cursor.getInt(cursor.getColumnIndex("idFormItem")));
                 r.setIdOpcao(cursor.getInt(cursor.getColumnIndex("idOpcao")));
                 r.setTodo(cursor.getInt(cursor.getColumnIndex("todo")));
@@ -133,7 +131,7 @@ public class RespostaDao {
         List<Resposta> lista = new ArrayList<>();
 
         Cursor cursor = getDataBase().rawQuery("SELECT r._idResposta,r.txtResposta, r.idPergunta, f.idForm, r.idOpcao, r.todo, r.valor " +
-                "FROM resposta r, formItem f WHERE r.idFormItem = ? and r.idFormItem = f._idFormItem", new String[]{idFormItem + ""});
+                "FROM resposta r, formItem f WHERE r.idFormItem = ? and r.idFormItem = f._idFormItem and f.idUsuario = ?", new String[]{idFormItem + "", idUsuario + ""});
         try {
             while (cursor.moveToNext()) {
                 Resposta r = new Resposta();

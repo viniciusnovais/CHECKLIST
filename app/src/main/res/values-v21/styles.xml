@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Material.Light.NoActionBar.Light" parent="android:Theme.Material.Light" />
+
+    <style name="AppTheme.AppCompat.Forms" parent="android:Theme.Material.Light" />
+</resources>
