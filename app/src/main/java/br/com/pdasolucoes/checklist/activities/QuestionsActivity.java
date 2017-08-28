@@ -2,6 +2,7 @@ package br.com.pdasolucoes.checklist.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -22,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,10 +47,12 @@ import br.com.pdasolucoes.checklist.model.ComplementoTodo;
 import br.com.pdasolucoes.checklist.model.Form;
 import br.com.pdasolucoes.checklist.model.FormItem;
 import br.com.pdasolucoes.checklist.model.Pergunta;
+import br.com.pdasolucoes.checklist.model.Setor;
 import br.com.pdasolucoes.checklist.util.ComponenteResposta;
 import br.com.pdasolucoes.checklist.util.CriaTodo;
 import br.com.pdasolucoes.checklist.util.CustomLinearLayoutManager;
 import br.com.pdasolucoes.checklist.util.CustomRecyclerView;
+import br.com.pdasolucoes.checklist.util.MostraLogoCliente;
 import br.com.pdasolucoes.checklist.util.VerificaConexao;
 import checklist.pdasolucoes.com.br.checklist.R;
 
@@ -64,7 +68,7 @@ public class QuestionsActivity extends AppCompatActivity {
     private ImageView imageCamera, imageTodo, image, imageComment, imageHelp, imageNotifica, arrowRight, arrowLeft;
     private final int CAMERA = 0, GALERIA = 1;
     private Bitmap originalBitmap, resizedBitmap, photo;
-    private AlertDialog dialog, dialogOpcoes, dialogTodo, dialogComment, dialogHelp;
+    private AlertDialog dialog, dialogOpcoes, dialogComment, dialogHelp;
     private Uri uriImagem;
     private List<Pergunta> listaPergunta;
     private PerguntaDao dao;
@@ -79,20 +83,19 @@ public class QuestionsActivity extends AppCompatActivity {
     private ComplementoRespostaDao complementoRespostaDao;
     private ComplementoTodoDao complementoTodoDao;
     final ComponenteResposta cr = new ComponenteResposta();
-
+    private LinearLayout ll;
     private AlertDialog dialogProgress;
-    private Handler handler = new Handler();
-    private int progressStatus = 0;
-    private static int progress;
-    private ProgressBar progressBar, progressBarQuestao;
+    private ProgressBar progressBar,progressBarQuestao;
+    private byte[] imageByte;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(R.layout.actionbar);
-        tvNomeFormAction = (TextView) findViewById(R.id.tvNomeFormAction);
-        nomeFormAction = getIntent().getExtras().getString("form");
+        getSupportActionBar().setCustomView(R.layout.actionbar_formulario);
+        MostraLogoCliente.mostra(this, getSupportActionBar().getCustomView());
+        tvNomeFormAction = (TextView) findViewById(R.id.nomeForm);
+        nomeFormAction = getIntent().getExtras().getString("nomeForm");
         setContentView(R.layout.question_activity);
         tvNomeFormAction.setText(nomeFormAction);
 
@@ -112,6 +115,8 @@ public class QuestionsActivity extends AppCompatActivity {
         AsyncPergunta task = new AsyncPergunta();
         task.execute();
 
+        ll = (LinearLayout) findViewById(R.id.erroFormulario);
+
         textBar = (TextView) findViewById(R.id.textBar);
         textMax = (TextView) findViewById(R.id.textMax);
 
@@ -124,21 +129,6 @@ public class QuestionsActivity extends AppCompatActivity {
         imageTodo = (ImageView) findViewById(R.id.imagetoDo);
         imageHelp = (ImageView) findViewById(R.id.help);
         imageNotifica = (ImageView) findViewById(R.id.bell);
-
-        if (complementoRespostaDao.contadorImagens(getIntent().getExtras().getInt("ItemId")) > 0) {
-            tvNumeroNotificaCamera.setVisibility(View.VISIBLE);
-            tvNumeroNotificaCamera.setText((complementoRespostaDao.contadorImagens(getIntent().getExtras().getInt("ItemId")) + ""));
-        }
-
-        if (complementoRespostaDao.contadorComentario(getIntent().getExtras().getInt("ItemId")) > 0) {
-            getTvNumeroNotificaComment.setVisibility(View.VISIBLE);
-            getTvNumeroNotificaComment.setText(complementoRespostaDao.contadorComentario(getIntent().getExtras().getInt("ItemId")) + "");
-        }
-
-        if (daoTodo.contadorTodo(getIntent().getExtras().getInt("ItemId")) > 0) {
-            tvNotificaTodo.setVisibility(View.VISIBLE);
-            tvNotificaTodo.setText(daoTodo.contadorTodo(getIntent().getExtras().getInt("ItemId")) + "");
-        }
 
         arrowLeft = (ImageView) findViewById(R.id.arrowLeft);
         arrowRight = (ImageView) findViewById(R.id.arrowRight);
@@ -232,21 +222,6 @@ public class QuestionsActivity extends AppCompatActivity {
 
         dialogOpcoes = builder.create();
 
-        //Dialog TODO
-        View viewTodo = getLayoutInflater().inflate(R.layout.frame_todo, null);
-        AlertDialog.Builder builderTodo = new AlertDialog.Builder(QuestionsActivity.this);
-        builderTodo.setView(viewTodo);
-        dialogTodo = builderTodo.create();
-        btEnviarTodo = (Button) viewTodo.findViewById(R.id.btnGravar);
-
-        btEnviarTodo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Toast.makeText(QuestionsActivity.this, "Sucesso", Toast.LENGTH_SHORT).show();
-            }
-        });
-
         //Listener para o dialog da camera
         imageCamera.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -338,18 +313,38 @@ public class QuestionsActivity extends AppCompatActivity {
 
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (complementoRespostaDao.contadorImagens(getIntent().getExtras().getInt("ItemId")) > 0) {
+            tvNumeroNotificaCamera.setVisibility(View.VISIBLE);
+            tvNumeroNotificaCamera.setText((complementoRespostaDao.contadorImagens(getIntent().getExtras().getInt("ItemId")) + ""));
+        }
+
+        if (complementoRespostaDao.contadorComentario(getIntent().getExtras().getInt("ItemId")) > 0) {
+            getTvNumeroNotificaComment.setVisibility(View.VISIBLE);
+            getTvNumeroNotificaComment.setText(complementoRespostaDao.contadorComentario(getIntent().getExtras().getInt("ItemId")) + "");
+        }
+
+        if (daoTodo.contadorTodo(getIntent().getExtras().getInt("ItemId")) > 0) {
+            tvNotificaTodo.setVisibility(View.VISIBLE);
+            tvNotificaTodo.setText(daoTodo.contadorTodo(getIntent().getExtras().getInt("ItemId")) + "");
+        }
+    }
+
+    @Override
+    public void onActivityResult(final int requestCode, int resultCode, Intent data) {
         final View view = getLayoutInflater().inflate(R.layout.frame_image_todo, null);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(view);
         image = (ImageView) view.findViewById(R.id.image);
         btEnviarFoto = (Button) view.findViewById(R.id.btEnviarFoto);
         btCancelarImagem = (Button) view.findViewById(R.id.btCancelar);
-        byte[] imageByte;
-        ComplementoResposta cr = new ComplementoResposta();
-        ComplementoTodo ct = new ComplementoTodo();
-        if (resultCode == MainActivity.RESULT_OK) {
-            //Colocar imagem da Camera no Dialog
+        final ComplementoResposta cr = new ComplementoResposta();
+        final ComplementoTodo ct = new ComplementoTodo();
+        //Colocar imagem da Camera no Dialog
+        if (resultCode == RESULT_OK) {
             switch (requestCode) {
 
                 case CAMERA:
@@ -360,12 +355,6 @@ public class QuestionsActivity extends AppCompatActivity {
 
 
                     imageByte = getBitmapAsByteArray(originalBitmap);
-                    cr.setImage(imageByte);
-                    cr.setIdPergunta(adapter.getItem(POSITION).getIdPergunta());
-                    cr.setIdFormItem(IDFORMITEM);
-
-                    complementoRespostaDao.incluir(cr);
-
                     image.setImageBitmap(resizedBitmap);
 
                     dialog = builder.create();
@@ -380,12 +369,7 @@ public class QuestionsActivity extends AppCompatActivity {
                     resizedBitmap = Bitmap.createScaledBitmap(
                             originalBitmap, 530, 530, false);
 
-
                     imageByte = getBitmapAsByteArray(originalBitmap);
-                    ct.setImage(imageByte);
-                    ct.setIdTodo(daoTodo.buscarMaior());
-
-                    complementoTodoDao.incluir(ct);
 
                     image.setImageBitmap(resizedBitmap);
 
@@ -412,10 +396,6 @@ public class QuestionsActivity extends AppCompatActivity {
                         image.setImageBitmap(resizedBitmap);
 
                         imageByte = getBitmapAsByteArray(originalBitmap);
-                        cr.setImage(imageByte);
-                        cr.setIdPergunta(adapter.getItem(POSITION).getIdPergunta());
-                        cr.setIdFormItem(IDFORMITEM);
-
                         complementoRespostaDao.incluir(cr);
 
                         dialog = builder.create();
@@ -442,11 +422,6 @@ public class QuestionsActivity extends AppCompatActivity {
                         resizedBitmap = Bitmap.createScaledBitmap(
                                 originalBitmap, 530, 530, false);
                         image.setImageBitmap(resizedBitmap);
-
-                        imageByte = getBitmapAsByteArray(originalBitmap);
-                        ct.setImage(imageByte);
-                        ct.setIdTodo(daoTodo.buscarMaior());
-
                         complementoTodoDao.incluir(ct);
 
                         dialog = builder.create();
@@ -477,12 +452,28 @@ public class QuestionsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Toast.makeText(QuestionsActivity.this, "Salvou", Toast.LENGTH_SHORT).show();
 
+                if (requestCode == 2 || requestCode == 3) {
+                    ct.setImage(imageByte);
+                    ct.setIdTodo(daoTodo.ultimoId() + 1);
+
+                    complementoTodoDao.incluir(ct);
+                } else {
+                    cr.setImage(imageByte);
+                    cr.setIdPergunta(adapter.getItem(POSITION).getIdPergunta());
+                    cr.setIdFormItem(IDFORMITEM);
+
+                    complementoRespostaDao.incluir(cr);
+
+                }
+
+                CriaTodo.atualizaNotificacoesTempoRealCamera(QuestionsActivity.this, IDFORMITEM, IDPERGUNTA);
 
                 if (getIntent().hasExtra("QueryActivity")) {
                     if (complementoRespostaDao.contadorImagens(getIntent().getExtras().getInt("ItemId")) > 0) {
                         tvNumeroNotificaCamera.setVisibility(View.VISIBLE);
                         tvNumeroNotificaCamera.setText(((complementoRespostaDao.contadorImagens(getIntent().getExtras().getInt("ItemId"))) + ""));
                     }
+
                 } else {
                     if (complementoRespostaDao.contadorImagens(daoItemForm.buscarMaxId()) > 0) {
                         tvNumeroNotificaCamera.setVisibility(View.VISIBLE);
@@ -497,47 +488,28 @@ public class QuestionsActivity extends AppCompatActivity {
 
     }
 
+
     public class AsyncPergunta extends AsyncTask<Objects, Integer, Integer> {
 
+        SharedPreferences preferences = getSharedPreferences(MainActivity.PREF_NAME, MODE_PRIVATE);
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
 
-            if (VerificaConexao.isNetworkConnected(QuestionsActivity.this)) {
-                Log.w("progreas", "start");
-                new Thread(new Runnable() {
-                    public void run() {
-                        progressStatus = doSomeWork();
-                        handler.post(new Runnable() {
-                            public void run() {
-                                dialogProgress.show();
-                                progressBar.setProgress(progressStatus);
-                            }
-                        });
-                    }
-
-                private int doSomeWork() {
-                    try {
-                        // ---simulate doing some work---
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    return ++progress;
+            if (!getIntent().hasExtra("QueryActivity")) {
+                if (VerificaConexao.isNetworkConnected(QuestionsActivity.this)) {
+                    dialogProgress.show();
                 }
-                }).start();
             }
 
         }
 
         @Override
         protected Integer doInBackground(Objects... objectses) {
-
-            if (VerificaConexao.isNetworkConnected(QuestionsActivity.this)) {
-                listaPergunta = new ArrayList<>();
-                listaPergunta = dao.getPerguntaWS(getIntent().getExtras().getInt("idForm"));
-                dao.incluir(listaPergunta);
+            if (!getIntent().hasExtra("QueryActivity")) {
+                if (VerificaConexao.isNetworkConnected(QuestionsActivity.this)) {
+                }
             }
 
             return 1;
@@ -550,24 +522,43 @@ public class QuestionsActivity extends AppCompatActivity {
 
             mRecyclerView = (CustomRecyclerView) findViewById(R.id.rv_list);
 
-            CustomLinearLayoutManager llm = new CustomLinearLayoutManager(QuestionsActivity.this, LinearLayoutManager.HORIZONTAL, false);
-            mRecyclerView.setLayoutManager(llm);
-
-            if (getIntent().hasExtra("StartActivity") == true) {
-                Form f = new Form();
-                f.setIdForm(getIntent().getExtras().getInt("idForm"));
-                f.setNomeFom(getIntent().getExtras().getString("nomeForm"));
-                formItem.setIdForm(f);
-                daoItemForm.incluir(formItem);
-
-                adapter = new Question2Adapter(QuestionsActivity.this, dao.listar(getIntent().getExtras().getInt("idForm")), daoItemForm.buscarMaxId());
-                mRecyclerView.setAdapter(adapter);
-
+            if (dao.listar(getIntent().getExtras().getInt("idSetor")).size() < 1) {
+                mRecyclerView.setVisibility(View.GONE);
+                ll.setVisibility(View.VISIBLE);
             } else {
-                adapter = new Question2Adapter(QuestionsActivity.this, dao.listar(getIntent().getExtras().getInt("idForm")),
-                        getIntent().getExtras().getInt("ItemId"));
-                mRecyclerView.setAdapter(adapter);
 
+                CustomLinearLayoutManager llm = new CustomLinearLayoutManager(QuestionsActivity.this, LinearLayoutManager.HORIZONTAL, false);
+                mRecyclerView.setLayoutManager(llm);
+
+                if (getIntent().hasExtra("StartActivity")) {
+                    Form f = new Form();
+                    f.setIdForm(getIntent().getExtras().getInt("idForm"));
+                    f.setNomeFom(getIntent().getExtras().getString("nomeForm"));
+                    formItem.setIdForm(f);
+                    Setor s = new Setor();
+                    s.setId(getIntent().getExtras().getInt("idSetor"));
+                    formItem.setIdSetor(s);
+                    String dataInicio = getIntent().getExtras().getString("dataHora").substring(0, 10);
+                    String horaInicio = getIntent().getExtras().getString("dataHora").substring(11, 16);
+                    formItem.setDataInicio(dataInicio);
+                    formItem.setHoraInicio(horaInicio);
+                    formItem.setIdUsuario(preferences.getInt("idUsuario", 0));
+                    daoItemForm.incluir(formItem);
+
+                    adapter = new Question2Adapter(QuestionsActivity.this, dao.listar(getIntent().getExtras().getInt("idSetor")), daoItemForm.buscarMaxId());
+                    mRecyclerView.setAdapter(adapter);
+
+                } else {
+                    adapter = new Question2Adapter(QuestionsActivity.this, dao.listar(getIntent().getExtras().getInt("idSetor")),
+                            getIntent().getExtras().getInt("ItemId"));
+                    mRecyclerView.setAdapter(adapter);
+                }
+            }
+
+            if (getIntent().hasExtra("pendencias")) {
+                adapter = new Question2Adapter(QuestionsActivity.this, dao.listarNaoRespondidas(getIntent().getExtras().getInt("idSetor"), daoItemForm.buscarMaxId()),
+                        daoItemForm.buscarMaxId());
+                mRecyclerView.setAdapter(adapter);
             }
 
             textMax.setText(adapter.getItemCount() + "");
@@ -603,11 +594,14 @@ public class QuestionsActivity extends AppCompatActivity {
                 }
             });
 
-            if (progres == 1) {
+            if (progres == 1)
+
+            {
                 dialogProgress.dismiss();
             }
 
         }
+
     }
 
     public static byte[] getBitmapAsByteArray(Bitmap bitmap) {

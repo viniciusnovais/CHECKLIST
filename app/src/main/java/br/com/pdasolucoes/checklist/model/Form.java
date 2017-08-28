@@ -7,13 +7,14 @@ import java.util.Date;
  * Created by PDA on 04/11/2016.
  */
 
-public class Form implements Serializable{
+public class Form implements Serializable {
     private int idForm;
     private String nomeFom;
     private String dataForm;
     private String nomeLoja;
-    private int hora;
+    private String hora;
     private int status;
+    private int alterado;
 
     public int getIdForm() {
         return idForm;
@@ -55,11 +56,19 @@ public class Form implements Serializable{
         this.status = status;
     }
 
-    public int getHora() {
+    public String getHora() {
         return hora;
     }
 
-    public void setHora(int hora) {
+    public void setHora(String hora) {
         this.hora = hora;
+    }
+
+    public int getAlterado() {
+        return alterado;
+    }
+
+    public void setAlterado(int alterado) {
+        this.alterado = alterado;
     }
 }

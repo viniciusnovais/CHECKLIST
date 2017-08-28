@@ -43,7 +43,7 @@ public class SpinnerAdapterForm extends ArrayAdapter<Form> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        View v = View.inflate(context, R.layout.spinner_item_start,null);
+        View v = View.inflate(context, R.layout.custom_spinner_start,null);
         TextView text = (TextView) v.findViewById(R.id.text1);
 
         text.setText(values.get(position).getNomeFom());

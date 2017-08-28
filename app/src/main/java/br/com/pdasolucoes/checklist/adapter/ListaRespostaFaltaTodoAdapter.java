@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import br.com.pdasolucoes.checklist.dao.PerguntaDao;
 import br.com.pdasolucoes.checklist.model.Form;
 import br.com.pdasolucoes.checklist.model.Resposta;
 import checklist.pdasolucoes.com.br.checklist.R;
@@ -20,10 +21,13 @@ public class ListaRespostaFaltaTodoAdapter extends BaseAdapter {
 
     private List<Resposta> lista;
     private Context context;
+    private PerguntaDao perguntaDao;
 
     public ListaRespostaFaltaTodoAdapter(List<Resposta> lista, Context context) {
         this.lista = lista;
         this.context = context;
+        perguntaDao = new PerguntaDao(context);
+
     }
 
     @Override
@@ -43,16 +47,16 @@ public class ListaRespostaFaltaTodoAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View view, ViewGroup viewGroup) {
-        View v = View.inflate(context, R.layout.lista_item_resposta_falta_todo,null);
+        View v = View.inflate(context, R.layout.lista_item_resposta_falta_todo, null);
 
         TextView tvNomeForm = (TextView) v.findViewById(R.id.tvNomeForm);
-        tvNomeForm.setText(lista.get(position).getIdPergunta().getIdForm().getNomeFom()+"");
+        tvNomeForm.setText(perguntaDao.buscaNomePerguntaeForm(lista.get(position).getIdPergunta()).get(0).getIdForm().getNomeFom());
 
         TextView tvTituloPergunta = (TextView) v.findViewById(R.id.tvNumeroPergunta);
-        tvTituloPergunta.setText(lista.get(position).getIdPergunta().getTxtPergunta());
+        tvTituloPergunta.setText(perguntaDao.buscaNomePerguntaeForm(lista.get(position).getIdPergunta()).get(0).getTxtPergunta());
 
         TextView tvRespostaNaoConforme = (TextView) v.findViewById(R.id.tvtextoTodo);
-        tvRespostaNaoConforme.setText(lista.get(position).getIdPergunta().getOpcaoQuestaoTodo());
+        tvRespostaNaoConforme.setText(lista.get(position).getTxtResposta());
 
 
         return v;

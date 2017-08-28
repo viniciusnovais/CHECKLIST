@@ -14,6 +14,10 @@ public class Pergunta {
     private int tipoPergunta;
     private String opcaoQuestaoTodo;
     private Form idForm;
+    private float peso;
+    private int alterado;
+    private int idSetor;
+    private int idPadraoResposta;
 
     public int getIdPergunta() {
         return idPergunta;
@@ -53,5 +57,37 @@ public class Pergunta {
 
     public void setIdForm(Form idForm) {
         this.idForm = idForm;
+    }
+
+    public float getPeso() {
+        return peso;
+    }
+
+    public void setPeso(float peso) {
+        this.peso = peso;
+    }
+
+    public int getAlterado() {
+        return alterado;
+    }
+
+    public void setAlterado(int alterado) {
+        this.alterado = alterado;
+    }
+
+    public int getIdSetor() {
+        return idSetor;
+    }
+
+    public void setIdSetor(int idSetor) {
+        this.idSetor = idSetor;
+    }
+
+    public int getIdPadraoResposta() {
+        return idPadraoResposta;
+    }
+
+    public void setIdPadraoResposta(int idPadraoResposta) {
+        this.idPadraoResposta = idPadraoResposta;
     }
 }

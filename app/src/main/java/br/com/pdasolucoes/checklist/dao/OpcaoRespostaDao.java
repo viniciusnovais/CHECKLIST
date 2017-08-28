@@ -9,11 +9,18 @@ import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.pdasolucoes.checklist.model.Form;
 import br.com.pdasolucoes.checklist.model.OpcaoResposta;
+import br.com.pdasolucoes.checklist.model.Pergunta;
 import br.com.pdasolucoes.checklist.model.Resposta;
 import br.com.pdasolucoes.checklist.util.WebService;
 
@@ -48,23 +55,31 @@ public class OpcaoRespostaDao {
     public void incluir(List<OpcaoResposta> lista) {
         ContentValues values = new ContentValues();
         for (OpcaoResposta or : lista) {
-            if (existeOpcaoQuestao(or.getIdOpcao()) == false) {
+            if (!adicionado(or.getIdOpcao(), or.getIdPergunta())) {
                 values.put("_idOpcao", or.getIdOpcao());
                 values.put("opcao", or.getOpcao());
                 values.put("idPergunta", or.getIdPergunta());
+                values.put("percentual", or.getPercentual());
+                values.put("maior", or.getMaior());
+                values.put("menor", or.getMenor());
+                values.put("valor", or.getValor());
+                values.put("todo", or.getToDo());
+                values.put("horaMaior", or.getHoraMaior());
+                values.put("horaMenor", or.getHoraMenor());
+                values.put("dataMaior", or.getDataMaior());
+                values.put("dataMenor", or.getDataMenor());
 
                 getDataBase().insert("opcaoQuestao", null, values);
             }
         }
     }
 
-    public boolean existeOpcaoQuestao(int id) {
-        boolean existe = false;
-        Cursor cursor = getDataBase().rawQuery("SELECT _idOpcao FROM opcaoQuestao where _idOpcao = ?", new String[]{id + ""});
+    public boolean adicionado(int idOpcao, int idPergunta) {
+        Cursor cursor = getDataBase().rawQuery("SELECT * FROM opcaoQuestao where _idOpcao = ? and idPergunta = ?", new String[]{idOpcao + "", idPergunta + ""});
         while (cursor.moveToNext()) {
-            existe = true;
+            return true;
         }
-        return existe;
+        return false;
     }
 
     public List<OpcaoResposta> listar(int id) {
@@ -77,12 +92,53 @@ public class OpcaoRespostaDao {
 
                 or.setIdOpcao(cursor.getInt(cursor.getColumnIndex("_idOpcao")));
                 or.setOpcao(cursor.getString(cursor.getColumnIndex("opcao")));
+                or.setValor(cursor.getFloat(cursor.getColumnIndex("valor")));
                 or.setIdPergunta(cursor.getInt(cursor.getColumnIndex("idPergunta")));
+                or.setPercentual(cursor.getFloat(cursor.getColumnIndex("percentual")));
+                or.setMaior(cursor.getFloat(cursor.getColumnIndex("maior")));
+                or.setToDo(cursor.getInt(cursor.getColumnIndex("todo")));
+                or.setMenor(cursor.getFloat(cursor.getColumnIndex("menor")));
+                or.setHoraMaior(cursor.getString(cursor.getColumnIndex("horaMaior")));
+                or.setHoraMenor(cursor.getString(cursor.getColumnIndex("horaMenor")));
+                or.setDataMenor(cursor.getString(cursor.getColumnIndex("dataMenor")));
+                or.setDataMaior(cursor.getString(cursor.getColumnIndex("dataMenor")));
+
                 lista.add(or);
             }
 
         } finally {
             cursor.close();
+        }
+        return lista;
+    }
+
+
+    public int buscarTodo(int idOpcao) {
+        int todo = 0;
+        Cursor cursor = getDataBase().rawQuery("SELECT todo FROM opcaoQuestao WHERE _idOpcao = ?", new String[]{idOpcao + ""});
+        {
+
+            while (cursor.moveToNext()) {
+                todo = cursor.getInt(cursor.getColumnIndex("todo"));
+            }
+        }
+        return todo;
+    }
+
+    public List<OpcaoResposta> listarTodasOpcoesForm(int idFormItem, int idPergunta) {
+        List<OpcaoResposta> lista = new ArrayList<>();
+        Cursor cursor = getDataBase().rawQuery("SELECT MAX(valor) as maxValor FROM opcaoQuestao op, formItem f WHERE op.idPergunta = ? and f._idFormItem = ?", new String[]{idPergunta + "", idFormItem + ""});
+        try {
+            while (cursor.moveToNext()) {
+                OpcaoResposta or = new OpcaoResposta();
+
+                or.setValor(cursor.getFloat(cursor.getColumnIndex("maxValor")));
+
+                lista.add(or);
+            }
+        } finally {
+            cursor.close();
+            //getDataBase().close();
         }
         return lista;
     }
@@ -100,6 +156,7 @@ public class OpcaoRespostaDao {
                 or.setOpcao(cursor.getString(cursor.getColumnIndex("opcao")));
                 or.setIdPergunta(cursor.getInt(cursor.getColumnIndex("idPergunta")));
                 or.setTxtResposta(cursor.getString(cursor.getColumnIndex("txtResposta")));
+                or.setValor(cursor.getFloat(cursor.getColumnIndex("valor")));
 
                 lista.add(or);
             }
@@ -110,29 +167,92 @@ public class OpcaoRespostaDao {
         return lista;
     }
 
-    public List<OpcaoResposta> getOpcaoQuestaoWS() {
+    //public List<OpcaoResposta> getOpcaoQuestaoWS() {
+//        List<OpcaoResposta> lista = new ArrayList<>();
+//
+//        String url = WebService.URL_SHEETS + "ac9082c2e0c4";
+//        String resposta = WebService.makeRequest(url);
+//        try {
+//            JSONArray array = new JSONArray(resposta);
+//
+//            for (int i = 0; i < array.length(); i++) {
+//                JSONObject json = array.getJSONObject(i);
+//
+//                OpcaoResposta or = new OpcaoResposta();
+//                or.setIdOpcao(json.getInt("idOpcao"));
+//                or.setOpcao(json.getString("opcao"));
+//                or.setIdPergunta(json.getInt("idPergunta"));
+//
+//                lista.add(or);
+//
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        return lista;
+//    }
+
+    private static String URL = "http://179.184.159.52/wsforms/wsopcao.asmx";
+
+    private static String SOAP_ACTION = "http://tempuri.org/GetOpcaoPorPadraoResposta";
+
+    private static String NAMESPACE = "http://tempuri.org/";
+
+    public List<OpcaoResposta> listarOpcaoResposta(int idPadrao, int idPergunta) {
         List<OpcaoResposta> lista = new ArrayList<>();
 
-        String url = WebService.URL_SHEETS + "ac9082c2e0c4";
-        String resposta = WebService.makeRequest(url);
+        SoapObject response = null;
+        // Create request
+        SoapObject request = new SoapObject(NAMESPACE, "GetOpcaoPorPadraoResposta");
+        // Property which holds input parameters
+        PropertyInfo unamePI = new PropertyInfo();
+        // Set Username
+        unamePI.setName("idPadrao");
+        // Set Value
+        unamePI.setValue(idPadrao);
+        // Set dataType
+        unamePI.setType(String.class);
+        //Add the property to request object
+        request.addProperty(unamePI);
+        // Create envelope
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+        envelope.dotNet = true;
+        // Set output SOAP object
+        envelope.setOutputSoapObject(request);
+        // Create HTTP call object
+        HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+
         try {
-            JSONArray array = new JSONArray(resposta);
+            // Invoke web service
+            androidHttpTransport.call(SOAP_ACTION, envelope);
+            // Get the response
+            response = (SoapObject) envelope.getResponse();
+            SoapObject itemResponse;
+            for (int i = 0; i < response.getPropertyCount(); i++) {
+                itemResponse = (SoapObject) response.getProperty(i);
+                OpcaoResposta op = new OpcaoResposta();
 
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject json = array.getJSONObject(i);
+                op.setIdOpcao(Integer.parseInt(itemResponse.getProperty("id").toString()));
+                op.setOpcao(itemResponse.getProperty("opcao").toString());
+                op.setIdPergunta(idPergunta);
+                op.setPercentual(Float.parseFloat(itemResponse.getProperty("percentual").toString()));
+                op.setMaior(Float.parseFloat(itemResponse.getProperty("maior").toString()));
+                op.setMenor(Float.parseFloat(itemResponse.getProperty("menor").toString()));
+                op.setValor(Float.parseFloat(itemResponse.getProperty("valor").toString()));
+                op.setToDo(Integer.parseInt(itemResponse.getProperty("toDo").toString()));
+                op.setHoraMaior(itemResponse.getProperty("horaMaior").toString());
+                op.setHoraMenor(itemResponse.getProperty("horaMenor").toString());
+                op.setDataMaior(itemResponse.getProperty("dataMaior").toString());
+                op.setDataMenor(itemResponse.getProperty("dataMenor").toString());
 
-                OpcaoResposta or = new OpcaoResposta();
-                or.setIdOpcao(json.getInt("idOpcao"));
-                or.setOpcao(json.getString("opcao"));
-                or.setIdPergunta(json.getInt("idPergunta"));
-
-                lista.add(or);
-
+                lista.add(op);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        //Return booleam to calling object
         return lista;
     }
 

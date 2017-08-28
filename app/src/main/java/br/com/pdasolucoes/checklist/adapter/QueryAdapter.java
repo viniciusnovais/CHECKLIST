@@ -59,12 +59,14 @@ public final class QueryAdapter extends RecyclerView.Adapter<QueryAdapter.MyView
 
         holder.tvId.setText(String.valueOf(lista.get(position).getIdItem()));
         holder.tvIdForm.setText(lista.get(position).getIdForm().getNomeFom());
+        holder.tvSetor.setText(lista.get(position).getIdSetor().getNome());
 
         if (lista.get(position).getStatus() == 0) {
             holder.imageView.setImageResource(R.drawable.exclamation);
-        }else if (lista.get(position).getStatus()==1){
+        } else if (lista.get(position).getStatus() == 1) {
             holder.imageView.setImageResource(R.drawable.checked);
         }
+
 
     }
 
@@ -83,7 +85,7 @@ public final class QueryAdapter extends RecyclerView.Adapter<QueryAdapter.MyView
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public TextView tvId, tvIdForm;
+        public TextView tvId, tvIdForm, tvSetor;
         public ImageView imageView;
 
 
@@ -92,6 +94,8 @@ public final class QueryAdapter extends RecyclerView.Adapter<QueryAdapter.MyView
             tvId = (TextView) itemView.findViewById(R.id.tvIdFormItem);
             tvIdForm = (TextView) itemView.findViewById(R.id.tvNomeForm);
             imageView = (ImageView) itemView.findViewById(R.id.imageStatus);
+            tvSetor = (TextView) itemView.findViewById(R.id.tvSetor);
+
             itemView.setOnClickListener(this);
         }
 

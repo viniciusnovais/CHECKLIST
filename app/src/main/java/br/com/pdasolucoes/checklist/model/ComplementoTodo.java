@@ -9,7 +9,7 @@ public class ComplementoTodo {
     private int idComplemento;
     private byte[] image;
     private String comentario;
-    private Todo idTodo;
+    private int idTodo;
 
     public int getIdComplemento() {
         return idComplemento;
@@ -35,11 +35,11 @@ public class ComplementoTodo {
         this.comentario = comentario;
     }
 
-    public Todo getIdTodo() {
+    public int getIdTodo() {
         return idTodo;
     }
 
-    public void setIdTodo(Todo idTodo) {
+    public void setIdTodo(int idTodo) {
         this.idTodo = idTodo;
     }
 }

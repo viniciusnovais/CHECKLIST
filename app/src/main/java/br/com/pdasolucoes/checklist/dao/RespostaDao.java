@@ -48,9 +48,10 @@ public class RespostaDao {
         ContentValues values = new ContentValues();
 
         values.put("txtResposta", resposta.getTxtResposta());
-        values.put("idPergunta", resposta.getIdPergunta().getIdPergunta());
+        values.put("idPergunta", resposta.getIdPergunta());
         values.put("idFormItem", resposta.getIdFormItem());
         values.put("idOpcao", resposta.getIdOpcao());
+        values.put("valor", resposta.getValor());
         values.put("todo", 0);
 
         return getDataBase().insert("resposta", null, values);
@@ -63,15 +64,16 @@ public class RespostaDao {
     public void alterarResposta(Resposta resposta) {
         ContentValues values = new ContentValues();
         values.put("txtResposta", resposta.getTxtResposta());
-        values.put("todo", 0);
-        Log.w("passou", "isnottodo");
+        values.put("todo", resposta.getTodo());
+        values.put("valor", resposta.getValor());
+        values.put("idOpcao", resposta.getIdOpcao());
+
         getDataBase().update("resposta", values, "_idResposta=?", new String[]{resposta.getIdResposta() + ""});
     }
 
     public void isTodo(int idResposta) {
         ContentValues values = new ContentValues();
         values.put("todo", 1);
-        Log.w("idResposta", idResposta + "");
         getDataBase().update("resposta", values, "_idResposta = " + idResposta, null);
     }
 
@@ -84,12 +86,13 @@ public class RespostaDao {
                 Resposta r = new Resposta();
                 r.setIdResposta(cursor.getInt(cursor.getColumnIndex("_idResposta")));
                 r.setTxtResposta(cursor.getString(cursor.getColumnIndex("txtResposta")));
-                Pergunta p =  new Pergunta();
-                p.setIdPergunta(cursor.getInt(cursor.getColumnIndex("idPergunta")));
-                r.setIdPergunta(p);
+//                Pergunta p =  new Pergunta();
+//                p.setIdPergunta(cursor.getInt(cursor.getColumnIndex("idPergunta")));
+                r.setIdPergunta(cursor.getInt(cursor.getColumnIndex("idPergunta")));
                 r.setIdFormItem(cursor.getInt(cursor.getColumnIndex("idFormItem")));
                 r.setIdOpcao(cursor.getInt(cursor.getColumnIndex("idOpcao")));
                 r.setTodo(cursor.getInt(cursor.getColumnIndex("todo")));
+                r.setValor(cursor.getFloat(cursor.getColumnIndex("valor")));
                 lista.add(r);
             }
         } finally {
@@ -100,22 +103,48 @@ public class RespostaDao {
         return lista;
     }
 
-    public List<Resposta> listarResposta(int idFormItem) {
+    public List<Resposta> respotaPeloIdPergunta(int idPergunta, int idFormItem) {
 
         List<Resposta> lista = new ArrayList<>();
-
-        Cursor cursor = getDataBase().rawQuery("SELECT * FROM resposta WHERE idFormItem = ?", new String[]{idFormItem + ""});
+        Cursor cursor = getDataBase().rawQuery("SELECT * FROM resposta WHERE idPergunta = ? and idFormItem = ?", new String[]{idPergunta + "", idFormItem + ""});
         try {
             while (cursor.moveToNext()) {
                 Resposta r = new Resposta();
                 r.setIdResposta(cursor.getInt(cursor.getColumnIndex("_idResposta")));
                 r.setTxtResposta(cursor.getString(cursor.getColumnIndex("txtResposta")));
-                Pergunta p =  new Pergunta();
-                p.setIdPergunta(cursor.getInt(cursor.getColumnIndex("idPergunta")));
-                r.setIdPergunta(p);
+                r.setIdPergunta(cursor.getInt(cursor.getColumnIndex("idPergunta")));
                 r.setIdFormItem(cursor.getInt(cursor.getColumnIndex("idFormItem")));
                 r.setIdOpcao(cursor.getInt(cursor.getColumnIndex("idOpcao")));
                 r.setTodo(cursor.getInt(cursor.getColumnIndex("todo")));
+                r.setValor(cursor.getFloat(cursor.getColumnIndex("valor")));
+
+                lista.add(r);
+            }
+        } finally {
+            cursor.close();
+        }
+
+
+        return lista;
+    }
+
+    public List<Resposta> listarResposta(int idFormItem, int idUsuario) {
+
+        List<Resposta> lista = new ArrayList<>();
+
+        Cursor cursor = getDataBase().rawQuery("SELECT r._idResposta,r.txtResposta, r.idPergunta, f.idForm, r.idOpcao, r.todo, r.valor " +
+                "FROM resposta r, formItem f WHERE r.idFormItem = ? and r.idFormItem = f._idFormItem", new String[]{idFormItem + ""});
+        try {
+            while (cursor.moveToNext()) {
+                Resposta r = new Resposta();
+                r.setIdResposta(cursor.getInt(cursor.getColumnIndex("_idResposta")));
+                r.setTxtResposta(cursor.getString(cursor.getColumnIndex("txtResposta")));
+                r.setIdPergunta(cursor.getInt(cursor.getColumnIndex("idPergunta")));
+                r.setIdFormItem(cursor.getInt(cursor.getColumnIndex("idForm")));
+                r.setIdOpcao(cursor.getInt(cursor.getColumnIndex("idOpcao")));
+                r.setTodo(cursor.getInt(cursor.getColumnIndex("todo")));
+                r.setValor(cursor.getFloat(cursor.getColumnIndex("valor")));
+                r.setIdUsuario(idUsuario);
                 lista.add(r);
             }
         } finally {
@@ -134,6 +163,20 @@ public class RespostaDao {
         //try {
         while (cursor.moveToNext()) {
             id = cursor.getInt(cursor.getColumnIndex("_idResposta"));
+        }
+        // } finally {
+        cursor.close();
+        //}
+        return id;
+    }
+
+    public int buscarIdUltimaResposta() {
+        int id = 0;
+        Cursor cursor = getDataBase().rawQuery("SELECT MAX(_idResposta) as maxId FROM resposta", null);
+
+        //try {
+        while (cursor.moveToNext()) {
+            id = cursor.getInt(cursor.getColumnIndex("maxId"));
         }
         // } finally {
         cursor.close();
@@ -207,13 +250,14 @@ public class RespostaDao {
         return cnt;
     }
 
-    public List<Resposta> listaFaltaTodo() {
+    public List<Resposta> listaFaltaTodo(int idUsuario) {
         List<Resposta> lista = new ArrayList<>();
-        Cursor cursor = getDataBase().rawQuery("SELECT r.idFormItem,f._idForm,f.nomeForm,p._idPergunta,p.txtPergunta, p.opcaoQuestaoTodo" +
-                " FROM resposta r, pergunta p, form f where r.todo=1 and f._idForm = p.idForm and p._idPergunta = r.idPergunta" +
-                " and r.idPergunta NOT IN(SELECT idPergunta FROM todo)", null);
+        Cursor cursor = getDataBase().rawQuery("SELECT fi.idUsuario, r.idFormItem,f._idForm,f.nomeForm,p._idPergunta,p.txtPergunta, p.opcaoQuestaoTodo, r.txtResposta, r._idResposta" +
+                " FROM resposta r, pergunta p, form f, formItem fi" +
+                " WHERE r.todo=1 and p._idPergunta = r.idPergunta and fi.idForm = f._idForm and r.idFormItem = fi._idFormItem and p._idPergunta" +
+                " NOT IN(SELECT idPergunta FROM TODO t, formItem f WHERE t.idFormItem = f._idFormItem and f.idUsuario = ?) and fi.idUsuario = ?", new String[]{idUsuario + "", idUsuario + ""});
 
-        while (cursor.moveToNext()){
+        while (cursor.moveToNext()) {
             Form f = new Form();
             f.setIdForm(cursor.getInt(cursor.getColumnIndex("_idForm")));
             f.setNomeFom(cursor.getString(cursor.getColumnIndex("nomeForm")));
@@ -224,8 +268,10 @@ public class RespostaDao {
             p.setIdForm(f);
 
             Resposta r = new Resposta();
+            r.setIdResposta(cursor.getInt(cursor.getColumnIndex("_idResposta")));
             r.setIdFormItem(cursor.getInt(cursor.getColumnIndex("idFormItem")));
-            r.setIdPergunta(p);
+            r.setIdPergunta(cursor.getInt(cursor.getColumnIndex("_idPergunta")));
+            r.setTxtResposta(cursor.getString(cursor.getColumnIndex("txtResposta")));
 
 
             lista.add(r);

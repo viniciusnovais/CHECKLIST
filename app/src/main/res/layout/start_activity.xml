@@ -1,49 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!--<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"--><!--android:layout_width="match_parent"--><!--android:layout_height="match_parent">-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_marginTop="20dp"
+    android:orientation="vertical">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    <!--<ImageView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="130dp"-->
+    <!--android:layout_marginTop="10dp"-->
+    <!--app:srcCompat="@mipmap/logo" />-->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:baselineAligned="false"
+        android:layout_height="0dp"
+        android:layout_weight=".1"
+        android:gravity="center"
         android:orientation="vertical">
-
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="130dp"
-            android:layout_marginTop="10dp"
-            app:srcCompat="@mipmap/logo" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="10dp"
             android:text="@string/starting"
             android:textSize="18dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:fontFamily="casual"
             android:text="Form"
             android:textSize="25dp" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_weight=".3"
+        android:background="@color/colorPrimary"
+        android:orientation="vertical"
+        android:paddingBottom="15dp"
+        android:paddingTop="15dp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="5dp"
-            android:background="@color/colorPrimary"
             android:orientation="vertical"
-            android:paddingBottom="15dp"
-            android:paddingTop="15dp">
+            android:gravity="center"
+            android:layout_height="match_parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -63,10 +71,35 @@
                     android:id="@+id/spinnerForm"
                     android:layout_width="match_parent"
                     android:layout_height="22dp"
-                    android:background="@drawable/border_iniciar"
-                    android:layout_marginLeft="15dp" />
+                    android:layout_marginLeft="15dp"
+                    android:background="@drawable/bg_spinner_start" />
 
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:paddingLeft="40dp"
+                android:paddingRight="45dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setor"
+                    android:textSize="20dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerSetor"
+                    android:layout_width="match_parent"
+                    android:layout_height="22dp"
+                    android:layout_marginLeft="15dp"
+                    android:background="@drawable/bg_spinner_start" />
+
+            </LinearLayout>
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -89,7 +122,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
                     android:background="@color/whiteSame"
-                    android:focusable="false" />
+                    android:focusable="false"
+                    android:maxLines="1" />
 
             </LinearLayout>
 
@@ -115,7 +149,8 @@
                     android:id="@+id/editData"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="21dp"
+                    android:layout_marginLeft="20dp"
+                    android:maxLines="1"
                     android:background="@color/white"
                     android:focusable="false" />
 
@@ -123,65 +158,67 @@
 
         </LinearLayout>
 
-        <LinearLayout
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight=".2"
+        android:gravity="bottom|center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/appointmentBook"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@drawable/border_button_home"
+            android:src="@drawable/calendar" />
+
+        <ImageButton
+            android:id="@+id/start"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/border_button_home"
+            android:src="@drawable/start" />
+
+        <ImageButton
+            android:id="@+id/home"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/border_button_home"
+            android:src="@drawable/home" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="25dp"
-            android:orientation="horizontal">
+            android:layout_marginRight="65dp"
+            android:layout_marginTop="5dp"
+            android:text="AGENDA" />
 
-            <ImageButton
-                android:id="@+id/appointmentBook"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:background="@drawable/border_button_home"
-                android:src="@drawable/calendar" />
-
-            <ImageButton
-                android:id="@+id/start"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_marginLeft="10dp"
-                android:background="@drawable/border_button_home"
-                android:src="@drawable/start" />
-
-            <ImageButton
-                android:id="@+id/home"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_marginLeft="10dp"
-                android:background="@drawable/border_button_home"
-                android:src="@drawable/home" />
-        </LinearLayout>
-
-        <LinearLayout
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:orientation="horizontal">
+            android:layout_marginRight="70dp"
+            android:layout_marginTop="5dp"
+            android:text="INICIAR" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="65dp"
-                android:layout_marginTop="5dp"
-                android:text="AGENDA" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="70dp"
-                android:layout_marginTop="5dp"
-                android:text="INICIAR" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="5dp"
-                android:text="HOME" />
-
-        </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp"
+            android:text="HOME" />
 
     </LinearLayout>
-</ScrollView>
+
+</LinearLayout><!--</ScrollView>-->

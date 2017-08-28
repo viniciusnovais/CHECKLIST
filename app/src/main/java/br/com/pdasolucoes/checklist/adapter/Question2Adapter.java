@@ -49,6 +49,7 @@ import br.com.jansenfelipe.androidmask.MaskEditTextChangedListener;
 import br.com.pdasolucoes.checklist.activities.QuestionsActivity;
 import br.com.pdasolucoes.checklist.dao.FormItemDao;
 import br.com.pdasolucoes.checklist.dao.OpcaoRespostaDao;
+import br.com.pdasolucoes.checklist.dao.PerguntaDao;
 import br.com.pdasolucoes.checklist.dao.RespostaDao;
 import br.com.pdasolucoes.checklist.dao.TodoDao;
 import br.com.pdasolucoes.checklist.model.Form;
@@ -68,8 +69,8 @@ public class Question2Adapter extends RecyclerView.Adapter<Question2Adapter.MyVi
 
     private List<Pergunta> listaPergunta;
     private Context context;
-    private int id=0,idPergunta=0,tipoPergunta,idForm,cntqestoes=0, dia, mes,ano,hora,minuto;
-    int[] vetorIdPergunta,vetorTipoPergunta;
+    private int id = 0, idPergunta = 0, cntqestoes = 0;
+    int[] vetorIdPergunta, vetorTipoPergunta;
     private LayoutInflater mLayoutInflater;
     private PegaPosition pegaPosition;
     private PegaTodo pegaTodo;
@@ -79,36 +80,46 @@ public class Question2Adapter extends RecyclerView.Adapter<Question2Adapter.MyVi
     private RespostaDao daoRespostaa;
     private OpcaoResposta opResposta;
     private OpcaoRespostaDao daoOpResposta;
+    private PerguntaDao perguntaDao;
     private List<OpcaoResposta> listaOpResposta;
-    private int idFormItem=0;
+    private int idFormItem = 0;
 
     //Interfaces
-    public interface PegaTodo{void Pega(boolean todo);}
-    public interface PegaPosition{void pegaPosition(int pegaPosition, int idFormItem, int idPergunta);}
-
-    public void PegaTodoListener(PegaTodo pegaTodo){
-        this.pegaTodo=pegaTodo;
+    public interface PegaTodo {
+        void Pega(boolean todo);
     }
-    public void PegaPositionListener(PegaPosition pegaPosition){this.pegaPosition=pegaPosition;}
+
+    public interface PegaPosition {
+        void pegaPosition(int pegaPosition, int idFormItem, int idPergunta);
+    }
+
+    public void PegaTodoListener(PegaTodo pegaTodo) {
+        this.pegaTodo = pegaTodo;
+    }
+
+    public void PegaPositionListener(PegaPosition pegaPosition) {
+        this.pegaPosition = pegaPosition;
+    }
 
     //Construtor
-    public Question2Adapter(Context c, List<Pergunta> l, int idFormItem){
-        this.context=c;
+    public Question2Adapter(Context c, List<Pergunta> l, int idFormItem) {
+        this.context = c;
         this.listaPergunta = l;
-        this.idFormItem=idFormItem;
-        vetorQestoes=new String[getItemCount()];
-        vetorTipoPergunta=new int[getItemCount()];
-        vetorIdPergunta=new int[getItemCount()];
-        resposta= new Resposta();
-        daoRespostaa= new RespostaDao(c);
-        daoItem=new FormItemDao(c);
-        opResposta= new OpcaoResposta();
-        daoOpResposta= new OpcaoRespostaDao(c);
+        this.idFormItem = idFormItem;
+        vetorQestoes = new String[getItemCount()];
+        vetorTipoPergunta = new int[getItemCount()];
+        vetorIdPergunta = new int[getItemCount()];
+        resposta = new Resposta();
+        daoRespostaa = new RespostaDao(c);
+        daoItem = new FormItemDao(c);
+        opResposta = new OpcaoResposta();
+        perguntaDao = new PerguntaDao(c);
+        daoOpResposta = new OpcaoRespostaDao(c);
         listaOpResposta = new ArrayList<>();
         mLayoutInflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        AsyncOpResposta task = new AsyncOpResposta();
-        task.execute();
+//        AsyncOpResposta task = new AsyncOpResposta();
+//        task.execute();
     }
 
     //Cria uma nova View
@@ -125,86 +136,81 @@ public class Question2Adapter extends RecyclerView.Adapter<Question2Adapter.MyVi
     //Chamado toda  vez, vincula os dados da lista com a view
     @Override
     public void onBindViewHolder(final MyViewHolder myViewHolder, int position) {
-         int qtdeQuestoes;
+        int qtdeQuestoes;
+
+        listaPergunta.get(position).getIdForm().getIdForm();
 
         //Create RadioButton
-        if (listaPergunta.get(position).getTipoPergunta() == 2 ) {
-            idPergunta=listaPergunta.get(position).getIdPergunta();
+        if (listaPergunta.get(position).getTipoPergunta() == 2) {
+            idPergunta = listaPergunta.get(position).getIdPergunta();
             myViewHolder.radio = new RadioButton[daoOpResposta.listar(idPergunta).size()];
-            idForm=listaPergunta.get(position).getIdForm().getIdForm();
-            cntqestoes=position;
+            cntqestoes = position;
 
-            pegaPosition.pegaPosition(position,idFormItem,idPergunta);
+            pegaPosition.pegaPosition(position, idFormItem, idPergunta);
 
             myViewHolder.frameLayout.addView(
-                    ComponenteResposta.createRadioButton(context,position+1 + "." + listaPergunta.get(position).getTxtPergunta(), myViewHolder.radio,listaPergunta.get(position).getOpcaoQuestaoTodo(),daoOpResposta.listar(idPergunta),idFormItem,idPergunta,getItemCount(),cntqestoes));
+                    ComponenteResposta.createRadioButton(context, position + 1 + "." + listaPergunta.get(position).getTxtPergunta(), myViewHolder.radio, listaPergunta.get(position).getOpcaoQuestaoTodo(), daoOpResposta.listar(idPergunta), idFormItem, idPergunta, getItemCount(), cntqestoes));
 
             //Create CheckBox
-        } else if (listaPergunta.get(position).getTipoPergunta() == 1 ) {
+        } else if (listaPergunta.get(position).getTipoPergunta() == 4) {
             idPergunta = listaPergunta.get(position).getIdPergunta();
             myViewHolder.check = new CheckBox[daoOpResposta.listar(idPergunta).size()];
-            idForm=listaPergunta.get(position).getIdForm().getIdForm();
-            cntqestoes=position;
-
-            pegaPosition.pegaPosition(position,idFormItem,idPergunta);
+            cntqestoes = position;
+            pegaPosition.pegaPosition(position, idFormItem, idPergunta);
 
             myViewHolder.frameLayout.addView(
-                    ComponenteResposta.createCheck(context,position+1 + "." + listaPergunta.get(position).getTxtPergunta(), myViewHolder.check,listaPergunta.get(position).getOpcaoQuestaoTodo(),daoOpResposta.listar(idPergunta),idFormItem,getItemCount(),cntqestoes,idPergunta));
+                    ComponenteResposta.createCheck(context, position + 1 + "." + listaPergunta.get(position).getTxtPergunta(), myViewHolder.check, listaPergunta.get(position).getOpcaoQuestaoTodo(), daoOpResposta.listar(idPergunta), idFormItem, getItemCount(), cntqestoes, idPergunta));
             //Create EditText
-        }else if (listaPergunta.get(position).getTipoPergunta() == 3) {
+        } else if (listaPergunta.get(position).getTipoPergunta() == 1) {
             idPergunta = listaPergunta.get(position).getIdPergunta();
-            cntqestoes=position;
-            idForm=listaPergunta.get(position).getIdForm().getIdForm();
-
-            pegaPosition.pegaPosition(position,idFormItem,idPergunta);
+            cntqestoes = position;
+            pegaPosition.pegaPosition(position, idFormItem, idPergunta);
 
             myViewHolder.frameLayout.addView(
-                    ComponenteResposta.createEditText(context,position+1 + "." + listaPergunta.get(position).getTxtPergunta(),
-                            myViewHolder.editText,listaPergunta.get(position).getOpcaoQuestaoTodo(),daoOpResposta.listar(idPergunta),
-                            idFormItem,getItemCount(),cntqestoes,idPergunta));
+                    ComponenteResposta.createEditText(context, position + 1 + "." + listaPergunta.get(position).getTxtPergunta(),
+                            myViewHolder.editText, listaPergunta.get(position).getOpcaoQuestaoTodo(), daoOpResposta.listar(idPergunta),
+                            idFormItem, getItemCount(), cntqestoes, idPergunta));
             //Create Date
-        }else if (listaPergunta.get(position).getTipoPergunta()==4){
-            idPergunta=listaPergunta.get(position).getIdPergunta();
-            cntqestoes=position;
-
-            pegaPosition.pegaPosition(position,idFormItem,idPergunta);
-
-            myViewHolder.frameLayout.addView(
-                    ComponenteResposta.createDate(context,position+1+"."+listaPergunta.get(position).getTxtPergunta(),myViewHolder.editData,
-                            listaPergunta.get(position).getOpcaoQuestaoTodo(), daoOpResposta.listar(idPergunta),cntqestoes,getItemCount(),idFormItem,idPergunta));
-            //Create Hour
-        }else if (listaPergunta.get(position).getTipoPergunta()==5) {
+        } else if (listaPergunta.get(position).getTipoPergunta() == 5) {
             idPergunta = listaPergunta.get(position).getIdPergunta();
-            cntqestoes=position;
+            cntqestoes = position;
 
-            pegaPosition.pegaPosition(position,idFormItem,idPergunta);
+            pegaPosition.pegaPosition(position, idFormItem, idPergunta);
 
             myViewHolder.frameLayout.addView(
-                    ComponenteResposta.createHour(context,position+1 + "." + listaPergunta.get(position).getTxtPergunta(),
-                            myViewHolder.editTextHora,listaPergunta.get(position).getOpcaoQuestaoTodo(),
-                            daoOpResposta.listar(idPergunta),idFormItem,getItemCount(),cntqestoes,idPergunta));
+                    ComponenteResposta.createDate(context, position + 1 + "." + listaPergunta.get(position).getTxtPergunta(), myViewHolder.editData,
+                            listaPergunta.get(position).getOpcaoQuestaoTodo(), daoOpResposta.listar(idPergunta), cntqestoes, getItemCount(), idFormItem, idPergunta));
+            //Create Hour
+        } else if (listaPergunta.get(position).getTipoPergunta() == 7) {
+            idPergunta = listaPergunta.get(position).getIdPergunta();
+            cntqestoes = position;
 
-        }else if (listaPergunta.get(position).getTipoPergunta()==6) {
+            pegaPosition.pegaPosition(position, idFormItem, idPergunta);
+
+            myViewHolder.frameLayout.addView(
+                    ComponenteResposta.createHour(context, position + 1 + "." + listaPergunta.get(position).getTxtPergunta(),
+                            myViewHolder.editTextHora, listaPergunta.get(position).getOpcaoQuestaoTodo(),
+                            daoOpResposta.listar(idPergunta), idFormItem, getItemCount(), cntqestoes, idPergunta));
+
+        } else if (listaPergunta.get(position).getTipoPergunta() == 6) {
             idPergunta = listaPergunta.get(position).getIdPergunta();
             myViewHolder.rating = new RatingBar(context);
-            cntqestoes=position;
-
-            pegaPosition.pegaPosition(position,idFormItem,idPergunta);
+            cntqestoes = position;
+            pegaPosition.pegaPosition(position, idFormItem, idPergunta);
 
             myViewHolder.frameLayout.addView(
-                    ComponenteResposta.createRating(context,position+1 + "." + listaPergunta.get(position).getTxtPergunta(), myViewHolder.rating, listaPergunta.get(position).getOpcaoQuestaoTodo(),
-                            daoOpResposta.listar(idPergunta),idFormItem,idPergunta,cntqestoes,getItemCount()));
-        }else if (listaPergunta.get(position).getTipoPergunta()==7) {
+                    ComponenteResposta.createRating(context, position + 1 + "." + listaPergunta.get(position).getTxtPergunta(), myViewHolder.rating, listaPergunta.get(position).getOpcaoQuestaoTodo(),
+                            daoOpResposta.listar(idPergunta), idFormItem, idPergunta, cntqestoes, getItemCount()));
+        } else if (listaPergunta.get(position).getTipoPergunta() == 3) {
             idPergunta = listaPergunta.get(position).getIdPergunta();
             myViewHolder.editNumber = new EditText(context);
-            idForm=listaPergunta.get(position).getIdForm().getIdForm();
-            cntqestoes=position;
+            cntqestoes = position;
 
-            pegaPosition.pegaPosition(position,idFormItem,idPergunta);
+            pegaPosition.pegaPosition(position, idFormItem, idPergunta);
 
             myViewHolder.frameLayout.addView(
-                    ComponenteResposta.createEditNumber(context,position + 1 + "." + listaPergunta.get(position).getTxtPergunta(), myViewHolder.editNumber, listaPergunta.get(position).getOpcaoQuestaoTodo(),
-                            daoOpResposta.listar(idPergunta),idFormItem, idPergunta,cntqestoes,getItemCount()));
+                    ComponenteResposta.createEditNumber(context, position + 1 + "." + listaPergunta.get(position).getTxtPergunta(), myViewHolder.editNumber, listaPergunta.get(position).getOpcaoQuestaoTodo(),
+                            daoOpResposta.listar(idPergunta), idFormItem, idPergunta, cntqestoes, getItemCount()));
         }
     }
 
@@ -219,15 +225,15 @@ public class Question2Adapter extends RecyclerView.Adapter<Question2Adapter.MyVi
         return listaPergunta.size();
     }
 
-    public Pergunta getItem(int position){
+    public Pergunta getItem(int position) {
         return listaPergunta.get(position);
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder{
+    public class MyViewHolder extends RecyclerView.ViewHolder {
         public FrameLayout frameLayout;
         public RadioButton radio[];
         public CheckBox check[];
-        public EditText editText, editNumber, editTextHora,editData;
+        public EditText editText, editNumber, editTextHora, editData;
         public RatingBar rating;
 
         public MyViewHolder(View itemView) {
@@ -238,16 +244,18 @@ public class Question2Adapter extends RecyclerView.Adapter<Question2Adapter.MyVi
     }
 
 
-    public class AsyncOpResposta extends AsyncTask{
-
+    public class AsyncOpResposta extends AsyncTask<Integer, Void, Void> {
 
         @Override
-        protected Object doInBackground(Object[] objects) {
-            if (VerificaConexao.isNetworkConnected(context)) {
-                daoOpResposta.incluir(daoOpResposta.getOpcaoQuestaoWS());
-
-            }else{
-                //Frame com informações que está entrando offline
+        protected Void doInBackground(Integer... integers) {
+            Intent i = ((Activity) context).getIntent();
+            if (!i.hasExtra("QueryActivity")) {
+//                if (VerificaConexao.isNetworkConnected(context)) {
+//                    List<Pergunta> lista = perguntaDao.listar(daoItem.buscarIdSetor(idFormItem));
+//                    for (int cnt = 0; cnt < lista.size(); cnt++) {
+//                        daoOpResposta.incluir(daoOpResposta.listarOpcaoResposta(lista.get(cnt).getIdPadraoResposta(), lista.get(cnt).getIdPergunta()));
+//                    }
+//                }
             }
             return null;
         }

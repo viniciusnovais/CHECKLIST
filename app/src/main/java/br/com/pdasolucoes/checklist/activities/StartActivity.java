@@ -2,6 +2,7 @@ package br.com.pdasolucoes.checklist.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -24,8 +25,12 @@ import java.util.Calendar;
 import java.util.List;
 
 import br.com.pdasolucoes.checklist.adapter.SpinnerAdapterForm;
+import br.com.pdasolucoes.checklist.adapter.SpinnerAdapterSetor;
 import br.com.pdasolucoes.checklist.dao.FormDao;
+import br.com.pdasolucoes.checklist.dao.SetorDao;
 import br.com.pdasolucoes.checklist.model.Form;
+import br.com.pdasolucoes.checklist.model.Setor;
+import br.com.pdasolucoes.checklist.util.MostraLogoCliente;
 import br.com.pdasolucoes.checklist.util.VerificaConexao;
 import checklist.pdasolucoes.com.br.checklist.R;
 
@@ -38,19 +43,23 @@ public class StartActivity extends AppCompatActivity {
     private ImageButton imageBtnStart, imageBtnHome, imageBtnAppointment;
     private EditText editSite, editData;
     int dia, mes, ano, hora, minuto;
-    private Spinner spinnerForm;
+    private Spinner spinnerForm, spinnerSetor;
     private List<Form> listForm;
-    private FormDao dao = new FormDao(this);;
+    private FormDao dao = new FormDao(this);
+    private SetorDao setorDao = new SetorDao(this);
     private SpinnerAdapterForm adapterSpinner;
+    private SpinnerAdapterSetor adapterSetor;
     private List<Integer> listaInt;
-    private int idFormSpinner = 0;
+    private int idFormSpinner = 0, idSetor;
+    private List<Setor> listaSetor;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(R.layout.actionbar);
+        getSupportActionBar().setCustomView(R.layout.actionbar_iniciar);
+        MostraLogoCliente.mostra(this, getSupportActionBar().getCustomView());
         setContentView(R.layout.start_activity);
 
         imageBtnAppointment = (ImageButton) findViewById(R.id.appointmentBook);
@@ -58,6 +67,7 @@ public class StartActivity extends AppCompatActivity {
         imageBtnHome = (ImageButton) findViewById(R.id.home);
 
         spinnerForm = (Spinner) findViewById(R.id.spinnerForm);
+        spinnerSetor = (Spinner) findViewById(R.id.spinnerSetor);
         editSite = (EditText) findViewById(R.id.editSite);
         editData = (EditText) findViewById(R.id.editData);
 
@@ -71,7 +81,7 @@ public class StartActivity extends AppCompatActivity {
 
         adapterSpinner = new SpinnerAdapterForm(
                 StartActivity.this,
-                R.layout.spinner_item_start, dao.listar());
+                R.layout.custom_spinner_start, dao.listar());
 
     }
 
@@ -97,7 +107,8 @@ public class StartActivity extends AppCompatActivity {
                 Intent i = new Intent(StartActivity.this, QuestionsActivity.class);
 
                 i.putExtra("idForm", idFormSpinner);
-                i.putExtra("nomeForm",adapterSpinner.getItem(spinnerForm.getSelectedItemPosition()).getNomeFom());
+                i.putExtra("idSetor", idSetor);
+                i.putExtra("nomeForm", adapterSpinner.getItem(spinnerForm.getSelectedItemPosition()).getNomeFom());
                 i.putExtra("numero", spinnerForm.getSelectedItem().toString().lastIndexOf(spinnerForm.getSelectedItem().toString().length() - 1));
                 i.putExtra("StartActivity", "StartActivity");
 
@@ -110,6 +121,8 @@ public class StartActivity extends AppCompatActivity {
                 minuto = data.get(Calendar.MINUTE);
 
                 editData.setText(String.format("%02d/%02d/%04d %02d:%02d ", dia, mes + 1, ano, hora, minuto));
+
+                i.putExtra("dataHora", String.format("%02d/%02d/%04d %02d:%02d ", dia, mes + 1, ano, hora, minuto));
 
                 //criarNovoForm
                 startActivity(i);
@@ -130,8 +143,8 @@ public class StartActivity extends AppCompatActivity {
         if (getIntent().getExtras() != null) {
 
             adapterSpinner = new SpinnerAdapterForm(
-                    StartActivity.this,
-                    R.layout.spinner_item_start, dao.listar());
+                    StartActivity.this, R.layout.custom_spinner_start, dao.listar());
+            adapterSpinner.setDropDownViewResource(R.layout.spinner_item_start);
             spinnerForm.setAdapter(adapterSpinner);
             spinnerForm.setSelection(getIntent().getExtras().getInt("position"));
             spinnerForm.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -142,6 +155,39 @@ public class StartActivity extends AppCompatActivity {
                     editData.setText(String.format("%02d/%02d/%04d %02d:%02d ", dia, mes + 1, ano, hora, minuto));
                     //pegando o id do Form selecionado
                     idFormSpinner = f.getIdForm();
+
+
+                    listaSetor = new ArrayList<>();
+                    listaSetor = setorDao.listar(idFormSpinner);
+                    Setor s = new Setor();
+                    s.setId(-1);
+                    s.setNome("Tudo");
+                    s.setIdForm(idFormSpinner);
+                    s.setStatus(0);
+
+                    listaSetor.add(s);
+
+                    adapterSetor =
+                            new SpinnerAdapterSetor(StartActivity.this, R.layout.custom_spinner_start, listaSetor);
+                    adapterSetor.setDropDownViewResource(R.layout.spinner_item_start);
+                    spinnerSetor.setAdapter(adapterSetor);
+                    spinnerSetor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                            Setor s = adapterSetor.getItem(position);
+
+                            idSetor = s.getId();
+
+
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> adapterView) {
+
+                        }
+                    });
+
+
                 }
 
                 @Override
@@ -160,12 +206,19 @@ public class StartActivity extends AppCompatActivity {
         @Override
         protected Object doInBackground(Object[] objects) {
 
+            SharedPreferences preferences = getSharedPreferences("MainActivityPreferences", MODE_PRIVATE);
+
             if (VerificaConexao.isNetworkConnected(StartActivity.this)) {
-                listForm = dao.getFormWS();
+                listForm = dao.listarForms(preferences.getInt("idConta", 0));
+
                 listaInt = new ArrayList<>();
+                listaSetor = new ArrayList<>();
                 for (Form f : listForm) {
                     listaInt.add(f.getIdForm());
+                    listaSetor = setorDao.listaWeb(f.getIdForm());
+                    setorDao.incluir(listaSetor);
                 }
+
                 dao.deleteForm(listaInt);
             } else {
                 listForm = dao.listar();
@@ -182,8 +235,9 @@ public class StartActivity extends AppCompatActivity {
             //adiicionando forms na lista de spinner
             adapterSpinner = new SpinnerAdapterForm(
                     StartActivity.this,
-                    R.layout.spinner_item_start, listForm);
+                    R.layout.custom_spinner_start, listForm);
 
+            adapterSpinner.setDropDownViewResource(R.layout.spinner_item_start);
             spinnerForm.setAdapter(adapterSpinner);
 
             spinnerForm.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -194,6 +248,35 @@ public class StartActivity extends AppCompatActivity {
                     editData.setText(String.format("%02d/%02d/%04d %02d:%02d ", dia, mes + 1, ano, hora, minuto));
                     //pegando o id do Form selecionado
                     idFormSpinner = f.getIdForm();
+
+                    listaSetor = new ArrayList<>();
+                    listaSetor = setorDao.listar(idFormSpinner);
+                    Setor s = new Setor();
+                    s.setId(-1);
+                    s.setNome("Tudo");
+                    s.setIdForm(idFormSpinner);
+                    s.setStatus(0);
+
+                    listaSetor.add(s);
+
+
+                    adapterSetor =
+                            new SpinnerAdapterSetor(StartActivity.this, R.layout.custom_spinner_start, listaSetor);
+                    adapterSetor.setDropDownViewResource(R.layout.spinner_item_start);
+                    spinnerSetor.setAdapter(adapterSetor);
+                    spinnerSetor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                            Setor s = adapterSetor.getItem(position);
+                            idSetor = s.getId();
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> adapterView) {
+
+                        }
+                    });
+
                 }
 
                 @Override

@@ -55,11 +55,19 @@
     <string name="tituloPergunta">Título da pergunta:</string>
     <string name="resposta_nao_conforme">Resposta não conforme:</string>
     <string name="sync">Sync</string>
+    <string name="setor">Setor</string>
+    <string name="agenda">Agenda</string>
+    <string name="iniciar">Iniciar</string>
+    <string name="todo_pendentes">TODOs Pendentes</string>
+    <string name="consulta">Consulta</string>
+    <string name="nomeSetor">Setor:</string>
+    <string name="editar">Editar</string>
+    <string name="usuario">USUÁRIO</string>
 
     <string-array name="status_todo">
-        <item>Concluído</item>
         <item>Andamento</item>
         <item>Agendado</item>
+        <item>Concluído</item>
     </string-array>
 
 </resources>

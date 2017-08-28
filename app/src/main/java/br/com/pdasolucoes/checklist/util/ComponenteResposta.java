@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.support.annotation.IdRes;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.InputType;
@@ -23,6 +24,8 @@ import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.github.mikephil.charting.formatter.IFillFormatter;
 
 import java.util.List;
 
@@ -136,13 +139,14 @@ public class ComponenteResposta {
                         resposta.setTxtResposta(buttonView.getText().toString());
                         Pergunta p = new Pergunta();
                         p.setIdPergunta(idPergunta);
-                        resposta.setIdPergunta(p);
+                        resposta.setIdPergunta(idPergunta);
                         resposta.setIdFormItem(idFormItem);
 
                         daoResposta.incluirResposta(resposta);
+                        idResposta = daoResposta.buscarIdResposta(idFormItem, idPergunta);
 
                         if (qestaoTodo.equals(buttonView.getText().toString())) {
-                            CriaTodo.criaTodo(context, idPergunta, idFormItem);
+                            CriaTodo.criaTodo(context, idPergunta, idFormItem, idResposta, 1);
                             pegaTodo.Pega(true);
 
                             daoResposta.isTodo(daoResposta.buscarIdResposta(idFormItem, idPergunta, opcao.get(finalCnttxtcheck1).getIdOpcao()));
@@ -179,11 +183,11 @@ public class ComponenteResposta {
                     perguntaDao = new PerguntaDao(context);
                     formItemDao = new FormItemDao(context);
 
-                    if (daoResposta.contadorResposta(idFormItem)==perguntaDao.QtdePergunta(formItemDao.buscarIdForm(idFormItem))){
+                    if (daoResposta.contadorResposta(idFormItem) == perguntaDao.QtdePergunta(formItemDao.buscarIdSetor(idFormItem))) {
                         statusForm = 1;
                         formItemDao.alterarStatus(idFormItem);
                     }
-                    FinalizacaoFormulario.DialogFinalizacao(context, statusForm,idFormItem);
+                    FinalizacaoFormulario.DialogFinalizacao(context, statusForm, idFormItem);
                 }
             });
             linearLayout.addView(bt);
@@ -198,6 +202,8 @@ public class ComponenteResposta {
 
         final RespostaDao daoResposta = new RespostaDao(context);
         final Resposta resposta = new Resposta();
+        final OpcaoRespostaDao opcaoRespostaDao = new OpcaoRespostaDao(context);
+        formItemDao = new FormItemDao(context);
 
         int cntradio = 0, cnttxt = 0;
 
@@ -227,43 +233,50 @@ public class ComponenteResposta {
             radio[cntradio].setTextSize(20);
 
             radioGroup.setLayoutParams(lpViewRadio);
-            final int finalCntradio = cntradio;
-            radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(RadioGroup group, int checkedId) {
-                    pos = radioGroup.indexOfChild(group.findViewById(checkedId));
-                    if (radio[pos].isChecked()) {
 
-                        resposta.setIdOpcao(opcao.get(finalCntradio).getIdOpcao());
-                        resposta.setTxtResposta(radio[pos].getText().toString());
-                        Pergunta p = new Pergunta();
-                        p.setIdPergunta(idPergunta);
-                        resposta.setIdPergunta(p);
-                        resposta.setIdFormItem(idFormItem);
+                radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(RadioGroup group, int checkedId) {
 
-                        idResposta = daoResposta.buscarIdResposta(idFormItem, idPergunta);
-                        if (idResposta <= 0) {
-                            daoResposta.incluirResposta(resposta);
-                        } else {
-                            idResposta = daoResposta.buscarIdResposta(idFormItem, idPergunta);
+                        pos = radioGroup.indexOfChild(group.findViewById(checkedId));
+                        radio[pos].setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
 
-                            resposta.setIdResposta(idResposta);
-                            daoResposta.alterarResposta(resposta);
-                        }
+                                resposta.setIdOpcao(opcao.get(pos).getIdOpcao());
+                                resposta.setTxtResposta(radio[pos].getText().toString());
+                                resposta.setValor(opcao.get(pos).getValor());
+                                resposta.setTodo(opcao.get(pos).getToDo());
+                                Pergunta p = new Pergunta();
+                                p.setIdPergunta(idPergunta);
+                                resposta.setIdPergunta(idPergunta);
+                                resposta.setIdFormItem(idFormItem);
 
-                        if (radio[pos].getText().toString().equals(qestaotodo)) {
-                            CriaTodo.criaTodo(context, idPergunta, idFormItem);
-                            pegaTodo.Pega(true);
-                            daoResposta.isTodo(daoResposta.buscarIdResposta(idFormItem, idPergunta));
-                        } else {
-                            pegaTodo.Pega(false);
-                        }
+                                idResposta = daoResposta.buscarIdResposta(idFormItem, idPergunta);
+                                if (idResposta <= 0) {
+                                    daoResposta.incluirResposta(resposta);
+                                    idResposta = daoResposta.buscarIdResposta(idFormItem, idPergunta);
+                                } else {
+                                    idResposta = daoResposta.buscarIdResposta(idFormItem, idPergunta);
 
-                        pegaQtdeResposta.Pega(daoResposta.contadorResposta(idFormItem));
+                                    resposta.setIdResposta(idResposta);
+                                    daoResposta.alterarResposta(resposta);
+                                }
+
+                                if (opcao.get(pos).getToDo() == 1) {
+                                    CriaTodo.criaTodo(context, idPergunta, idFormItem, idResposta, 1);
+                                    pegaTodo.Pega(true);
+                                    daoResposta.isTodo(daoResposta.buscarIdResposta(idFormItem, idPergunta));
+                                } else {
+                                    pegaTodo.Pega(false);
+                                }
+
+                                pegaQtdeResposta.Pega(daoResposta.contadorResposta(idFormItem));
+                            }
+                        });
                     }
+                });
 
-                }
-            });
 
             radioGroup.addView(radio[cntradio]);
             cntradio = cntradio + 1;
@@ -279,12 +292,16 @@ public class ComponenteResposta {
                 if (radio[i].getText().toString().trim().equals(r.getTxtResposta())) {
                     radio[i].setChecked(true);
 
-                    if (radio[i].getText().toString().equals(qestaotodo)) {
+                    //Verifica se é todo e libera o botão
+                    if (opcaoRespostaDao.buscarTodo(r.getIdOpcao()) == 1) {
                         pegaTodo.Pega(true);
                     }
                 }
             }
+
+
         }
+
 
 //        Teste para saber se é a última questão, e botão para concluir form
         if (getItemCount == cntqestoes + 1) {
@@ -296,11 +313,11 @@ public class ComponenteResposta {
                     perguntaDao = new PerguntaDao(context);
                     formItemDao = new FormItemDao(context);
 
-                    if (daoResposta.contadorResposta(idFormItem)==perguntaDao.QtdePergunta(formItemDao.buscarIdForm(idFormItem))){
+                    if (daoResposta.contadorResposta(idFormItem) == perguntaDao.QtdePergunta(formItemDao.buscarIdSetor(idFormItem))) {
                         statusForm = 1;
                         formItemDao.alterarStatus(idFormItem);
                     }
-                    FinalizacaoFormulario.DialogFinalizacao(context, statusForm,idFormItem);
+                    FinalizacaoFormulario.DialogFinalizacao(context, statusForm, idFormItem);
                 }
             });
             linearLayout.addView(bt);
@@ -358,7 +375,7 @@ public class ComponenteResposta {
             @Override
             public void afterTextChanged(Editable editable) {
                 if (finalEditText.getText().toString().equals(qestaoTodo)) {
-                    CriaTodo.criaTodo(context, idPergunta, idFormItem);
+                    CriaTodo.criaTodo(context, idPergunta, idFormItem, idResposta, 3);
                     pegaTodo.Pega(true);
                     daoResposta.isTodo(daoResposta.buscarIdResposta(idFormItem, idPergunta));
                 } else {
@@ -376,7 +393,7 @@ public class ComponenteResposta {
                 if (!hasFocus) {
                     Pergunta p = new Pergunta();
                     p.setIdPergunta(idPergunta);
-                    resposta.setIdPergunta(p);
+                    resposta.setIdPergunta(idPergunta);
                     resposta.setIdFormItem(idFormItem);
                     resposta.setTxtResposta(finalEditText.getText().toString());
 
@@ -384,6 +401,7 @@ public class ComponenteResposta {
 
                     if (idResposta <= 0) {
                         daoResposta.incluirResposta(resposta);
+
                         if (finalEditText.getText().toString().equals(qestaoTodo)) {
                             daoResposta.isTodo(daoResposta.buscarIdResposta(idFormItem, idPergunta));
                         }
@@ -413,11 +431,11 @@ public class ComponenteResposta {
                     perguntaDao = new PerguntaDao(context);
                     formItemDao = new FormItemDao(context);
 
-                    if (daoResposta.contadorResposta(idFormItem)==perguntaDao.QtdePergunta(formItemDao.buscarIdForm(idFormItem))){
+                    if (daoResposta.contadorResposta(idFormItem) == perguntaDao.QtdePergunta(formItemDao.buscarIdSetor(idFormItem))) {
                         statusForm = 1;
                         formItemDao.alterarStatus(idFormItem);
                     }
-                    FinalizacaoFormulario.DialogFinalizacao(context, statusForm,idFormItem);
+                    FinalizacaoFormulario.DialogFinalizacao(context, statusForm, idFormItem);
                 }
             });
             linearLayout.addView(bt);
@@ -492,7 +510,7 @@ public class ComponenteResposta {
                 String data = finalEditDia.getText().toString();
                 data = data.replaceAll("/", "");
                 if (data.toString().equals(qestaotodo)) {
-                    CriaTodo.criaTodo(context, idPergunta, idFormItem);
+                    CriaTodo.criaTodo(context, idPergunta, idFormItem, idResposta, 4);
                     pegaTodo.Pega(true);
                     daoResposta.isTodo(daoResposta.buscarIdResposta(idFormItem, idPergunta));
                 } else {
@@ -508,7 +526,7 @@ public class ComponenteResposta {
                     resposta.setIdFormItem(idFormItem);
                     Pergunta p = new Pergunta();
                     p.setIdPergunta(idPergunta);
-                    resposta.setIdPergunta(p);
+                    resposta.setIdPergunta(idPergunta);
                     resposta.setTxtResposta(finalEditDia.getText().toString());
 
                     idResposta = daoResposta.buscarIdResposta(idFormItem, idPergunta);
@@ -549,11 +567,11 @@ public class ComponenteResposta {
                     perguntaDao = new PerguntaDao(context);
                     formItemDao = new FormItemDao(context);
 
-                    if (daoResposta.contadorResposta(idFormItem)==perguntaDao.QtdePergunta(formItemDao.buscarIdForm(idFormItem))){
+                    if (daoResposta.contadorResposta(idFormItem) == perguntaDao.QtdePergunta(formItemDao.buscarIdSetor(idFormItem))) {
                         statusForm = 1;
                         formItemDao.alterarStatus(idFormItem);
                     }
-                    FinalizacaoFormulario.DialogFinalizacao(context, statusForm,idFormItem);
+                    FinalizacaoFormulario.DialogFinalizacao(context, statusForm, idFormItem);
                 }
             });
             linearLayout.addView(bt);
@@ -624,7 +642,7 @@ public class ComponenteResposta {
                 String stringHora = finalEditHora.getText().toString();
                 stringHora = stringHora.replaceAll("[:]", "");
                 if (stringHora.toString().equals(qestaotodo)) {
-                    CriaTodo.criaTodo(context, idPergunta, idFormItem);
+                    CriaTodo.criaTodo(context, idPergunta, idFormItem, idResposta, 5);
                     pegaTodo.Pega(true);
                     daoResposta.isTodo(daoResposta.buscarIdResposta(idFormItem, idPergunta));
                 } else {
@@ -640,7 +658,7 @@ public class ComponenteResposta {
                 if (!hasFocus) {
                     Pergunta p = new Pergunta();
                     p.setIdPergunta(idPergunta);
-                    resposta.setIdPergunta(p);
+                    resposta.setIdPergunta(idPergunta);
                     resposta.setIdFormItem(idFormItem);
                     resposta.setTxtResposta(finalEditHora.getText().toString());
 
@@ -684,11 +702,11 @@ public class ComponenteResposta {
                     perguntaDao = new PerguntaDao(context);
                     formItemDao = new FormItemDao(context);
 
-                    if (daoResposta.contadorResposta(idFormItem)==perguntaDao.QtdePergunta(formItemDao.buscarIdForm(idFormItem))){
+                    if (daoResposta.contadorResposta(idFormItem) == perguntaDao.QtdePergunta(formItemDao.buscarIdSetor(idFormItem))) {
                         statusForm = 1;
                         formItemDao.alterarStatus(idFormItem);
                     }
-                    FinalizacaoFormulario.DialogFinalizacao(context, statusForm,idFormItem);
+                    FinalizacaoFormulario.DialogFinalizacao(context, statusForm, idFormItem);
                 }
             });
             linearLayout.addView(bt);
@@ -743,7 +761,7 @@ public class ComponenteResposta {
                 if (b) {
                     Pergunta p = new Pergunta();
                     p.setIdPergunta(idPergunta);
-                    resposta.setIdPergunta(p);
+                    resposta.setIdPergunta(idPergunta);
                     resposta.setIdFormItem(idFormItem);
                     resposta.setTxtResposta(finalRating.getRating() + "");
                     idResposta = daoResposta.buscarIdResposta(idFormItem, idPergunta);
@@ -764,7 +782,7 @@ public class ComponenteResposta {
                     stringRating = stringRating.replace("0", "");
 
                     if (stringRating.equals(qestaotodo)) {
-                        CriaTodo.criaTodo(context, idPergunta, idFormItem);
+                        CriaTodo.criaTodo(context, idPergunta, idFormItem, idResposta, 6);
                         pegaTodo.Pega(true);
                         daoResposta.isTodo(daoResposta.buscarIdResposta(idFormItem, idPergunta));
                     }
@@ -786,11 +804,11 @@ public class ComponenteResposta {
                     perguntaDao = new PerguntaDao(context);
                     formItemDao = new FormItemDao(context);
 
-                    if (daoResposta.contadorResposta(idFormItem)==perguntaDao.QtdePergunta(formItemDao.buscarIdForm(idFormItem))){
+                    if (daoResposta.contadorResposta(idFormItem) == perguntaDao.QtdePergunta(formItemDao.buscarIdSetor(idFormItem))) {
                         statusForm = 1;
                         formItemDao.alterarStatus(idFormItem);
                     }
-                    FinalizacaoFormulario.DialogFinalizacao(context, statusForm,idFormItem);
+                    FinalizacaoFormulario.DialogFinalizacao(context, statusForm, idFormItem);
                 }
             });
             linearLayout.addView(bt);
@@ -856,7 +874,7 @@ public class ComponenteResposta {
             @Override
             public void afterTextChanged(Editable editable) {
                 if (finalEditText.getText().toString().equals(qestaotodo)) {
-                    CriaTodo.criaTodo(context, idPergunta, idFormItem);
+                    CriaTodo.criaTodo(context, idPergunta, idFormItem, idResposta, 7);
                     pegaTodo.Pega(true);
                     daoResposta.isTodo(daoResposta.buscarIdResposta(idFormItem, idPergunta));
                 } else {
@@ -871,7 +889,7 @@ public class ComponenteResposta {
                 if (!hasFocus) {
                     Pergunta p = new Pergunta();
                     p.setIdPergunta(idPergunta);
-                    resposta.setIdPergunta(p);
+                    resposta.setIdPergunta(idPergunta);
                     resposta.setIdFormItem(idFormItem);
                     resposta.setTxtResposta(finalEditText.getText().toString());
                     idResposta = daoResposta.buscarIdResposta(idFormItem, idPergunta);
@@ -909,11 +927,11 @@ public class ComponenteResposta {
                     perguntaDao = new PerguntaDao(context);
                     formItemDao = new FormItemDao(context);
 
-                    if (daoResposta.contadorResposta(idFormItem)==perguntaDao.QtdePergunta(formItemDao.buscarIdForm(idFormItem))){
+                    if (daoResposta.contadorResposta(idFormItem) == perguntaDao.QtdePergunta(formItemDao.buscarIdSetor(idFormItem))) {
                         statusForm = 1;
                         formItemDao.alterarStatus(idFormItem);
                     }
-                    FinalizacaoFormulario.DialogFinalizacao(context, statusForm,idFormItem);
+                    FinalizacaoFormulario.DialogFinalizacao(context, statusForm, idFormItem);
                 }
             });
             linearLayout.addView(bt);

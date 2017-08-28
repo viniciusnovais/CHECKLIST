@@ -1,25 +1,43 @@
 package br.com.pdasolucoes.checklist.util;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.plattysoft.leonids.ParticleSystem;
+
 import org.json.JSONException;
 
+import java.util.List;
+
 import br.com.pdasolucoes.checklist.activities.HomeActivity;
+import br.com.pdasolucoes.checklist.activities.QueryActivity;
 import br.com.pdasolucoes.checklist.activities.QuestionsActivity;
 import br.com.pdasolucoes.checklist.dao.ComplementoRespostaDao;
 import br.com.pdasolucoes.checklist.dao.FormItemDao;
+import br.com.pdasolucoes.checklist.dao.OpcaoRespostaDao;
+import br.com.pdasolucoes.checklist.dao.PerguntaDao;
 import br.com.pdasolucoes.checklist.dao.RespostaDao;
+import br.com.pdasolucoes.checklist.dao.TodoDao;
 import br.com.pdasolucoes.checklist.model.ComplementoResposta;
+import br.com.pdasolucoes.checklist.model.OpcaoResposta;
+import br.com.pdasolucoes.checklist.model.Pergunta;
 import br.com.pdasolucoes.checklist.model.Resposta;
 import checklist.pdasolucoes.com.br.checklist.R;
 
@@ -34,8 +52,10 @@ public class FinalizacaoFormulario {
     private static Context context;
     private static int status = 0;
     private static RespostaDao dao;
+    private static TodoDao todoDao;
     private static FormItemDao formItemDao;
-    private static ComplementoRespostaDao daoComplementoR;
+    private static PerguntaDao perguntaDao;
+    private static OpcaoRespostaDao opcaoRespostaDao;
     private static int id;
     private static AlertDialog dialogProgress;
     private static Handler handler = new Handler();
@@ -53,11 +73,13 @@ public class FinalizacaoFormulario {
 
         context = c;
         status = statusForm;
-        id=idFormItem;
+        id = idFormItem;
 
         dao = new RespostaDao(context);
-        daoComplementoR = new ComplementoRespostaDao(context);
         formItemDao = new FormItemDao(context);
+        todoDao = new TodoDao(context);
+        opcaoRespostaDao = new OpcaoRespostaDao(context);
+        perguntaDao = new PerguntaDao(context);
 
         //alert progressBar
         AlertDialog.Builder builderProgress = new AlertDialog.Builder(context);
@@ -78,13 +100,31 @@ public class FinalizacaoFormulario {
                 case DialogInterface.BUTTON_POSITIVE:
 
                     if (status == 0) {
-                        Toast.makeText(context, "Ainda não finalizou o Formulário", Toast.LENGTH_SHORT).show();
-                        //mudar status formItem
-                        Intent i = new Intent(context, HomeActivity.class);
-                        context.startActivity(i);
+                        AlertDialog.Builder builder2 = new AlertDialog.Builder(context);
+                        builder2.setMessage("Formulário possui pendências! Deseja completar ?")
+                                .setNegativeButton("Não", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                        Intent intent = new Intent(context, HomeActivity.class);
+                                        context.startActivity(intent);
+                                        Activity activity = (Activity) context;
+                                        activity.finish();
+                                    }
+                                })
+                                .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        Intent intent = new Intent(context, QuestionsActivity.class);
+                                        intent.putExtra("pendencias", "pendencias");
+                                        intent.putExtra("idSetor", formItemDao.idSetor(id));
+                                        context.startActivity(intent);
+                                        Activity activity = (Activity) context;
+                                        activity.finish();
+                                    }
+                                }).create().show();
 
-                        Activity activity = (Activity) context;
-                        activity.finish();
+
                     } else {
                         Toast.makeText(context, "Finalizando formulário...", Toast.LENGTH_SHORT).show();
                         AsyncEnviarResposta task = new AsyncEnviarResposta();
@@ -107,27 +147,7 @@ public class FinalizacaoFormulario {
             super.onPreExecute();
 
             if (VerificaConexao.isNetworkConnected(context)) {
-                new Thread(new Runnable() {
-                    public void run() {
-                        progressStatus = doSomeWork();
-                        handler.post(new Runnable() {
-                            public void run() {
-                                dialogProgress.show();
-                                progressBar.setProgress(progressStatus);
-                            }
-                        });
-                    }
-
-                    private int doSomeWork() {
-                        try {
-                            // ---simulate doing some work---
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        return ++progress;
-                    }
-                }).start();
+                dialogProgress.show();
             }
 
         }
@@ -136,11 +156,11 @@ public class FinalizacaoFormulario {
         protected Object doInBackground(Object[] objects) {
             if (VerificaConexao.isNetworkConnected(context)) {
                 try {
-                    for (Resposta r : dao.listarResposta(id)) {
-                        ServiceRespostaPost.post(r);
-                    }
+                    SharedPreferences preferences = context.getSharedPreferences("MainActivityPreferences", context.MODE_PRIVATE);
+                    ServiceRespostaPost.postResposta(dao.listarResposta(id, preferences.getInt("idUsuario", 0)));
+                    ServiceTodoPost.postTodo(todoDao.listarTodo(id));
                     formItemDao.alterarStatusSync(id);
-                } catch (JSONException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -151,17 +171,44 @@ public class FinalizacaoFormulario {
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
 
-            if (dialogProgress.isShowing()){
+            if (dialogProgress.isShowing()) {
                 dialogProgress.dismiss();
             }
 
-            Toast.makeText(context,"Formulário finalizado",Toast.LENGTH_SHORT).show();
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Sua Nota: ");
+            final AlertDialog dialog = builder.setView(MostraNota.MostraNotaView(context, indicadorGeral(perguntaDao.listar(formItemDao.buscarIdSetor(id)), id) * 100)).create();
 
-            Intent i = new Intent(context, HomeActivity.class);
-            context.startActivity(i);
+            dialog.show();
 
-            Activity activity = (Activity) context;
-            activity.finish();
+            dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialogInterface) {
+                    dialog.dismiss();
+
+                    Activity activity = (Activity) context;
+                    activity.finish();
+                }
+            });
+
         }
+    }
+
+    public static float indicadorGeral(List<Pergunta> pergunta, int id) {
+        float rIndicador = 0, indicador = 0, totalTodasPerguntasForm = 0;
+
+
+        for (Pergunta p : pergunta) {
+            for (OpcaoResposta op : opcaoRespostaDao.listarTodasOpcoesForm(id, p.getIdPergunta())) {
+                totalTodasPerguntasForm += op.getValor();
+            }
+            for (Resposta r : dao.respotaPeloIdPergunta(p.getIdPergunta(), id)) {
+
+                rIndicador += p.getPeso() * r.getValor();
+            }
+        }
+        indicador = rIndicador / totalTodasPerguntasForm;
+
+        return indicador;
     }
 }

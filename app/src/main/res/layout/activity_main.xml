@@ -59,7 +59,7 @@
         <TextView
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="@string/email"
+            android:text="@string/usuario"
             android:textColor="@color/black"
             android:layout_marginLeft="10dp"
             android:textSize="15dp"
@@ -73,7 +73,6 @@
         android:layout_marginRight="10dp"
         android:background="@color/whiteSame"
         android:id="@+id/editEmail"
-        android:hint="nome@email.com.br"
         />
         </LinearLayout>
 

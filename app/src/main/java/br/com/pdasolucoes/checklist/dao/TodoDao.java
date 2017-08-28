@@ -7,10 +7,20 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.github.mikephil.charting.renderer.scatter.ChevronUpShapeRenderer;
 
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.MarshalDate;
+import org.ksoap2.serialization.MarshalFloat;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import br.com.pdasolucoes.checklist.model.Agenda;
+import br.com.pdasolucoes.checklist.model.Resposta;
 import br.com.pdasolucoes.checklist.model.Todo;
 
 /**
@@ -41,27 +51,30 @@ public class TodoDao {
         }
     }
 
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
     public long incluir(Todo t) {
 
         ContentValues values = new ContentValues();
         values.put("justificativa", t.getJustificativa());
         values.put("acao", t.getAcao());
-        values.put("status", t.getStatus());
+        values.put("status", t.getStatus() + 1);
         values.put("responsavel", t.getResponsavel());
         values.put("prazo", t.getPrazo());
-        values.put("data", t.getDataLimite());
+        values.put("data", sdf.format(t.getDataLimite()));
         values.put("follow", t.getFollowup());
         values.put("idPergunta", t.getIdPergunta());
         values.put("idFormItem", t.getIdFormItem());
+        values.put("idResposta", t.getIdResposta());
 
-        return getDataBase().insert("todo",null,values);
+        return getDataBase().insert("todo", null, values);
 
     }
 
 
-    public List<Todo> listarTodo() {
+    public List<Todo> listarTodo(int idFormItem) {
         List<Todo> lista = new ArrayList<Todo>();
-        Cursor cursor = getDataBase().rawQuery("SELECT * FROM todo", null);
+        Cursor cursor = getDataBase().rawQuery("SELECT * FROM todo t, formItem f WHERE t.idFormItem = ? and t.idFormItem = f._idFormItem", new String[]{idFormItem + ""});
         while (cursor.moveToNext()) {
 
             Todo todo = new Todo();
@@ -71,10 +84,16 @@ public class TodoDao {
             todo.setResponsavel(cursor.getString(cursor.getColumnIndex("responsavel")));
             todo.setPrazo(cursor.getInt(cursor.getColumnIndex("prazo")));
             todo.setFollowup(cursor.getString(cursor.getColumnIndex("follow")));
-            todo.setDataLimite(cursor.getString(cursor.getColumnIndex("data")));
+
+            try {
+                todo.setDataLimite(sdf.parse(cursor.getString(cursor.getColumnIndex("data"))));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
             todo.setStatus(cursor.getInt(cursor.getColumnIndex("status")));
             todo.setIdPergunta(cursor.getInt(cursor.getColumnIndex("idPergunta")));
-            todo.setIdFormItem(cursor.getInt(cursor.getColumnIndex("idFormItem")));
+            todo.setIdResposta(cursor.getInt(cursor.getColumnIndex("idResposta")));
+            todo.setIdForm(cursor.getInt(cursor.getColumnIndex("idForm")));
             lista.add(todo);
         }
         return lista;
@@ -93,7 +112,11 @@ public class TodoDao {
             todo.setResponsavel(cursor.getString(cursor.getColumnIndex("responsavel")));
             todo.setPrazo(cursor.getInt(cursor.getColumnIndex("prazo")));
             todo.setFollowup(cursor.getString(cursor.getColumnIndex("follow")));
-            todo.setDataLimite(cursor.getString(cursor.getColumnIndex("data")));
+            try {
+                todo.setDataLimite(sdf.parse(cursor.getString(cursor.getColumnIndex("data"))));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
             todo.setStatus(cursor.getInt(cursor.getColumnIndex("status")));
             todo.setIdPergunta(cursor.getInt(cursor.getColumnIndex("idPergunta")));
             todo.setIdFormItem(cursor.getInt(cursor.getColumnIndex("idFormItem")));
@@ -102,43 +125,83 @@ public class TodoDao {
         return todo;
     }
 
-    public int contadorTodo(int idFormItem){
-        int cnt = 0;
-        Cursor cursor = getDataBase().rawQuery("SELECT COUNT(_idTodo) as cnt FROM todo WHERE idFormItem = ?",new String[]{idFormItem+""});
+    public int ultimoId() {
+        int id = 0;
+        Cursor cursor = getDataBase().rawQuery("SELECT MAX(_idTodo) as maxTodo FROM todo", null);
 
-        while (cursor.moveToNext()){
+        while (cursor.moveToNext()) {
+            id = cursor.getInt(cursor.getColumnIndex("maxTodo"));
+        }
+        return id;
+    }
+
+    public boolean existeId(int id) {
+        Cursor cursor = getDataBase().rawQuery("SELECT * FROM todo WHERE _idTodo = ?", new String[]{id + ""});
+
+        while (cursor.moveToNext()) {
+            return true;
+        }
+        return false;
+    }
+
+    public int contadorTodo(int idFormItem) {
+        int cnt = 0;
+        Cursor cursor = getDataBase().rawQuery("SELECT COUNT(_idTodo) as cnt FROM todo WHERE idFormItem = ?", new String[]{idFormItem + ""});
+
+        while (cursor.moveToNext()) {
             cnt = cursor.getInt(cursor.getColumnIndex("cnt"));
         }
 
         return cnt;
     }
 
-    public int contadorTodoPergunta(int idFormItem, int idPergunta){
+    public int contadorTodoPergunta(int idFormItem, int idPergunta) {
         int cnt = 0;
-        Cursor cursor = getDataBase().rawQuery("SELECT COUNT(_idTodo) as cnt FROM todo WHERE idFormItem = ? and idPergunta = ?",new String[]{idFormItem+"",idPergunta+""});
+        Cursor cursor = getDataBase().rawQuery("SELECT COUNT(_idTodo) as cnt FROM todo WHERE idFormItem = ? and idPergunta = ?", new String[]{idFormItem + "", idPergunta + ""});
 
-        while (cursor.moveToNext()){
+        while (cursor.moveToNext()) {
             cnt = cursor.getInt(cursor.getColumnIndex("cnt"));
         }
 
         return cnt;
     }
 
-    public int contadorRespostaFaltaTodo(){
+    public int contadorRespostaFaltaTodo(int idUsuario) {
         int cnt = 0;
-        Cursor cursor = getDataBase().rawQuery("SELECT COUNT(*) as cnt FROM(SELECT r._idResposta, r.txtResposta, r.idPergunta,r.idFormItem,r.idOpcao,r.todo" +
-                " FROM resposta r where r.todo=1 and idPergunta NOT IN(SELECT idPergunta FROM todo)) X",null);
+        Cursor cursor = getDataBase().rawQuery("SELECT count(*) as cnt FROM(SELECT r._idResposta, r.txtResposta, r.idPergunta,r.idFormItem,r.idOpcao,r.todo" +
+                " FROM resposta r,formItem f where r.todo=1 and f._idFormItem = r.idFormItem and f.idUsuario = ? and idPergunta NOT IN(SELECT idPergunta FROM TODO t, formItem f" +
+                " WHERE t.idFormItem = f._idFormItem and f.idUsuario = ?)) X", new String[]{idUsuario + "", idUsuario + ""});
 
-        try{
-            while (cursor.moveToNext()){
+        try {
+            while (cursor.moveToNext()) {
                 cnt = cursor.getInt(cursor.getColumnIndex("cnt"));
             }
-        }finally {
+        } finally {
             cursor.close();
         }
 
         return cnt;
     }
 
+    public int acaoDC(int idFormItem) {
+        int cnt = 0;
+        Cursor cursor = getDataBase().rawQuery("SELECT COUNT(*) as cnt FROM(SELECT r._idResposta, r.txtResposta, r.idPergunta,r.idFormItem,r.idOpcao,r.todo" +
+                " FROM resposta r where r.todo=1 and r.idFormItem = ? and idPergunta IN(SELECT idPergunta FROM todo)) X", new String[]{idFormItem + ""});
 
+        while (cursor.moveToNext()) {
+            cnt = cursor.getInt(cursor.getColumnIndex("cnt"));
+        }
+        return cnt;
+    }
+
+    public int acaoFC(int idFormItem, int idUsuario) {
+        int cnt = 0;
+        Cursor cursor = getDataBase().rawQuery("SELECT COUNT(*) as cnt FROM(SELECT r._idResposta, r.txtResposta, r.idPergunta,r.idFormItem,r.idOpcao,r.todo" +
+                " FROM resposta r where r.todo=1 and r.idFormItem = ? and idPergunta NOT IN(SELECT idPergunta FROM TODO t, formItem f WHERE t.idFormItem = f._idFormItem and f.idUsuario = ?)) X", new String[]{idFormItem + "", idUsuario + ""});
+
+        while (cursor.moveToNext()) {
+            cnt = cursor.getInt(cursor.getColumnIndex("cnt"));
+        }
+        return cnt;
+    }
 }
