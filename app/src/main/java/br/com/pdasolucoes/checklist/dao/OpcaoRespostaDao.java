@@ -68,6 +68,7 @@ public class OpcaoRespostaDao {
                 values.put("horaMenor", or.getHoraMenor());
                 values.put("dataMaior", or.getDataMaior());
                 values.put("dataMenor", or.getDataMenor());
+                //values.put("valorDiferente", or.getValorDiferente());
 
                 getDataBase().insert("opcaoQuestao", null, values);
             }
@@ -80,6 +81,10 @@ public class OpcaoRespostaDao {
             return true;
         }
         return false;
+    }
+
+    public void deletar() {
+        getDataBase().execSQL("DELETE FROM opcaoQuestao");
     }
 
     public List<OpcaoResposta> listar(int id) {
@@ -98,6 +103,7 @@ public class OpcaoRespostaDao {
                 or.setMaior(cursor.getFloat(cursor.getColumnIndex("maior")));
                 or.setToDo(cursor.getInt(cursor.getColumnIndex("todo")));
                 or.setMenor(cursor.getFloat(cursor.getColumnIndex("menor")));
+                //or.setValorDiferente(cursor.getFloat(cursor.getColumnIndex("valorDiferente")));
                 or.setHoraMaior(cursor.getString(cursor.getColumnIndex("horaMaior")));
                 or.setHoraMenor(cursor.getString(cursor.getColumnIndex("horaMenor")));
                 or.setDataMenor(cursor.getString(cursor.getColumnIndex("dataMenor")));
@@ -180,36 +186,38 @@ public class OpcaoRespostaDao {
             }
         } finally {
             cursor.close();
-            //getDataBase().close();
         }
         return lista;
     }
 
-    //public List<OpcaoResposta> getOpcaoQuestaoWS() {
-//        List<OpcaoResposta> lista = new ArrayList<>();
-//
-//        String url = WebService.URL_SHEETS + "ac9082c2e0c4";
-//        String resposta = WebService.makeRequest(url);
-//        try {
-//            JSONArray array = new JSONArray(resposta);
-//
-//            for (int i = 0; i < array.length(); i++) {
-//                JSONObject json = array.getJSONObject(i);
-//
-//                OpcaoResposta or = new OpcaoResposta();
-//                or.setIdOpcao(json.getInt("idOpcao"));
-//                or.setOpcao(json.getString("opcao"));
-//                or.setIdPergunta(json.getInt("idPergunta"));
-//
-//                lista.add(or);
-//
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        return lista;
-//    }
+    public List<OpcaoResposta> listarVoltaParaListaItem(int idFormItem, int idPergunta) {
+        List<OpcaoResposta> lista = new ArrayList<>();
+        Cursor cursor = getDataBase().rawQuery("select * from (SELECT o._idOpcao,o.opcao, o.idPergunta, r.txtresposta resp, r.valor v, o.maior, o.menor,o.todo FROM opcaoQuestao o" +
+                " inner join resposta r on o.idPergunta=r.idPergunta and o._idOpcao = r.idOpcao" +
+                " where  o.idPergunta = ? and r.idFormItem = ?" +
+                " UNION ALL" +
+                " SELECT o._idOpcao,o.opcao, o.idPergunta, '' resp, '' v, o.maior, o.menor,o.todo FROM opcaoQuestao o where  o.idPergunta = ?" +
+                " AND o._idOpcao NOT IN (SELECT idOpcao FROM resposta r WHERE r.idFormItem = ? and r.idPergunta = ?)) order by _idOpcao", new String[]{idPergunta + "", idFormItem + "", idPergunta + "", idFormItem + "", idPergunta + ""});
+        try {
+            while (cursor.moveToNext()) {
+                OpcaoResposta or = new OpcaoResposta();
+
+                or.setIdOpcao(cursor.getInt(cursor.getColumnIndex("_idOpcao")));
+                or.setOpcao(cursor.getString(cursor.getColumnIndex("opcao")));
+                or.setIdPergunta(cursor.getInt(cursor.getColumnIndex("idPergunta")));
+                or.setTxtResposta(cursor.getString(cursor.getColumnIndex("resp")));
+                or.setValor(cursor.getFloat(cursor.getColumnIndex("v")));
+                //or.setValorDiferente(cursor.getFloat(cursor.getColumnIndex("valorDiferente")));
+                or.setMaior(cursor.getFloat(cursor.getColumnIndex("maior")));
+                or.setMenor(cursor.getFloat(cursor.getColumnIndex("menor")));
+                or.setToDo(cursor.getInt(cursor.getColumnIndex("todo")));
+                lista.add(or);
+            }
+        } finally {
+            cursor.close();
+        }
+        return lista;
+    }
 
     private static String URL = "http://179.184.159.52/wsforms/wsopcao.asmx";
 
@@ -259,6 +267,7 @@ public class OpcaoRespostaDao {
                 op.setMenor(Float.parseFloat(itemResponse.getProperty("menor").toString()));
                 op.setValor(Float.parseFloat(itemResponse.getProperty("valor").toString()));
                 op.setToDo(Integer.parseInt(itemResponse.getProperty("toDo").toString()));
+                op.setValorDiferente(Float.parseFloat(itemResponse.getProperty("valorDiferente").toString()));
                 op.setHoraMaior(itemResponse.getProperty("horaMaior").toString());
                 op.setHoraMenor(itemResponse.getProperty("horaMenor").toString());
                 op.setDataMaior(itemResponse.getProperty("dataMaior").toString());

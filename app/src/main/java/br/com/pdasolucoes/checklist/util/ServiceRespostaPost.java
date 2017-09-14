@@ -118,9 +118,7 @@ public class ServiceRespostaPost {
             envelope.addMapping(NAMESPACE, "RespostaFormsEO", new Resposta().getClass());
             HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
 
-
             androidHttpTransport.call(SOAP_ACTION, envelope);
-
 
         } catch (Exception e) {
             e.printStackTrace();

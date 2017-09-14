@@ -142,6 +142,10 @@ public class FormItemDao {
         return cnt;
     }
 
+    public void deletar() {
+        getDataBase().execSQL("DELETE FROM FORMITEM WHERE IDFORM NOT IN (SELECT _IDFORM FROM FORM)");
+    }
+
     public int contadorFormItemConsulta(int idUsuario) {
         int cnt = 0;
         Cursor cursor = getDataBase().rawQuery(

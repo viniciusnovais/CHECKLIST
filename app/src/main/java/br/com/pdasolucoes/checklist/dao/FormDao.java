@@ -116,7 +116,11 @@ public class FormDao {
     public void deleteForm(List<Integer> lista) {
 
         String args = TextUtils.join(",", lista);
-        getDataBase().execSQL(String.format("DELETE FROM form where _idForm NOT IN (%s)", args));
+        getDataBase().execSQL(String.format("DELETE FROM form WHERE _idForm NOT IN (%s)", args));
+    }
+
+    public void deletar(){
+        getDataBase().execSQL("DELETE FROM form");
     }
 
     public int contarForm() {

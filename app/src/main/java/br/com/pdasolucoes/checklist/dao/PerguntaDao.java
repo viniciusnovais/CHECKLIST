@@ -91,24 +91,40 @@ public class PerguntaDao {
         return id;
     }
 
+    public void deletar(){
+        getDataBase().execSQL("DELETE FROM pergunta");
+    }
+
     public List<Pergunta> listar(int idSetor) {
+
+
         List<Pergunta> lista = new ArrayList<>();
+
         Cursor cursor = getDataBase().rawQuery("SELECT * FROM pergunta where idSetor=?", new String[]{idSetor + ""});
-        while (cursor.moveToNext()) {
-            Pergunta p = new Pergunta();
-            p.setIdPergunta(cursor.getInt(cursor.getColumnIndex("_idPergunta")));
-            p.setTxtPergunta(cursor.getString(cursor.getColumnIndex("txtPergunta")));
-            p.setOpcaoQuestaoTodo(cursor.getString(cursor.getColumnIndex("opcaoQuestaoTodo")));
-            p.setTipoPergunta(cursor.getInt(cursor.getColumnIndex("tipoPergunta")));
-            p.setIdSetor(cursor.getInt(cursor.getColumnIndex("idSetor")));
-            p.setPeso(cursor.getFloat(cursor.getColumnIndex("peso")));
-            p.setIdPadraoResposta(cursor.getInt(cursor.getColumnIndex("idPadraoResposta")));
-            Form f = new Form();
-            f.setIdForm(cursor.getInt(cursor.getColumnIndex("idForm")));
-            p.setIdForm(f);
-            lista.add(p);
+        try {
+
+            while (cursor.moveToNext()) {
+                Pergunta p = new Pergunta();
+                p.setIdPergunta(cursor.getInt(cursor.getColumnIndex("_idPergunta")));
+                p.setTxtPergunta(cursor.getString(cursor.getColumnIndex("txtPergunta")));
+                p.setOpcaoQuestaoTodo(cursor.getString(cursor.getColumnIndex("opcaoQuestaoTodo")));
+                p.setTipoPergunta(cursor.getInt(cursor.getColumnIndex("tipoPergunta")));
+                p.setIdSetor(cursor.getInt(cursor.getColumnIndex("idSetor")));
+                p.setPeso(cursor.getFloat(cursor.getColumnIndex("peso")));
+                p.setIdPadraoResposta(cursor.getInt(cursor.getColumnIndex("idPadraoResposta")));
+                Form f = new Form();
+                f.setIdForm(cursor.getInt(cursor.getColumnIndex("idForm")));
+                p.setIdForm(f);
+                lista.add(p);
+            }
+
+
+        } finally {
+            cursor.close();
         }
+
         return lista;
+
     }
 
     public List<Pergunta> listarNaoRespondidas(int idSetor, int idFormItem) {

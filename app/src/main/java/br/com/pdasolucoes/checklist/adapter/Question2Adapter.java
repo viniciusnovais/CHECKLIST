@@ -211,6 +211,16 @@ public class Question2Adapter extends RecyclerView.Adapter<Question2Adapter.MyVi
             myViewHolder.frameLayout.addView(
                     ComponenteResposta.createEditNumber(context, position + 1 + "." + listaPergunta.get(position).getTxtPergunta(), myViewHolder.editNumber, listaPergunta.get(position).getOpcaoQuestaoTodo(),
                             daoOpResposta.listar(idPergunta), idFormItem, idPergunta, cntqestoes, getItemCount()));
+        } else if (listaPergunta.get(position).getTipoPergunta() == 8) {
+            idPergunta = listaPergunta.get(position).getIdPergunta();
+            cntqestoes = position;
+
+            pegaPosition.pegaPosition(position, idFormItem, idPergunta);
+
+            myViewHolder.frameLayout.addView(ComponenteResposta.createListOpcoes(context, position + 1 + "." + listaPergunta.get(position).getTxtPergunta(), daoOpResposta.listar(idPergunta),
+                    idFormItem, idPergunta, cntqestoes, getItemCount()));
+
+
         }
     }
 

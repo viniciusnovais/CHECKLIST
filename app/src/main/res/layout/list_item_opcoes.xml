@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:textAlignment="center">
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:background="@drawable/border_lista"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:text="Item"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="15dp" />
+
+            <EditText
+                android:id="@+id/editText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".25"
+                android:background="@drawable/border_lista"
+                android:digits="0123456789."
+                android:imeOptions="actionNext"
+                android:inputType="numberDecimal"
+                android:maxLength="8"
+                android:maxLines="1"
+                android:nextFocusDown="@+id/editText"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="15dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="40.5dp"
+                android:layout_weight=".25"
+                android:gravity="center"
+                android:background="@drawable/border_lista">
+
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:src="@drawable/todo_48_gray" />
+
+
+            </LinearLayout>
+
+        </TableRow>
+    </TableLayout>
+
+</LinearLayout>

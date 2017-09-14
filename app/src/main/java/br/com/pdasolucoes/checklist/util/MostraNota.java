@@ -10,6 +10,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -31,12 +32,20 @@ import checklist.pdasolucoes.com.br.checklist.R;
 
 public class MostraNota {
 
-    public static View MostraNotaView(Context context, float nota) {
-        View view = View.inflate(context, R.layout.view_nota, null);
+    public static View MostraNotaView(final Context context, float nota) {
 
-        LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.linearLayout);
-        linearLayout.setGravity(Gravity.CENTER);
-        linearLayout.addView(createPie(context, nota));
+        View view = View.inflate(context, R.layout.view_nota, null);
+        Button btOk = (Button) view.findViewById(R.id.btOk);
+        PieChart chart = (PieChart) view.findViewById(R.id.pieChart);
+        createPie(chart, nota);
+
+        btOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Activity activity = (Activity) context;
+                activity.finish();
+            }
+        });
 
         return view;
     }
@@ -65,9 +74,7 @@ public class MostraNota {
         mChart.invalidate();
     }
 
-    public static PieChart createPie(Context context, float nota) {
-
-        PieChart mChart = new PieChart(context);
+    public static PieChart createPie(PieChart mChart, float nota) {
 
         mChart.setBackgroundColor(Color.WHITE);
 
@@ -95,7 +102,7 @@ public class MostraNota {
         Legend legend = mChart.getLegend();
         legend.setEnabled(false);
 
-        mChart.setCenterTextSize(19);
+        mChart.setCenterTextSize(30);
         mChart.setCenterTextColor(R.color.colorPrimary);
         mChart.setCenterTextOffset(0, 10);
 
@@ -112,12 +119,6 @@ public class MostraNota {
         mChart.setDrawEntryLabels(false);
         mChart.setDrawSliceText(false);
         mChart.setEntryLabelTextSize(12f);
-
-        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        lp.width = 400;
-        lp.height = 400;
-        lp.gravity = Gravity.CENTER;
-        mChart.setLayoutParams(lp);
 
         return mChart;
     }

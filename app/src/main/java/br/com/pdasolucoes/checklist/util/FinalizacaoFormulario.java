@@ -31,11 +31,13 @@ import br.com.pdasolucoes.checklist.activities.QueryActivity;
 import br.com.pdasolucoes.checklist.activities.QuestionsActivity;
 import br.com.pdasolucoes.checklist.dao.ComplementoRespostaDao;
 import br.com.pdasolucoes.checklist.dao.FormItemDao;
+import br.com.pdasolucoes.checklist.dao.LogoDao;
 import br.com.pdasolucoes.checklist.dao.OpcaoRespostaDao;
 import br.com.pdasolucoes.checklist.dao.PerguntaDao;
 import br.com.pdasolucoes.checklist.dao.RespostaDao;
 import br.com.pdasolucoes.checklist.dao.TodoDao;
 import br.com.pdasolucoes.checklist.model.ComplementoResposta;
+import br.com.pdasolucoes.checklist.model.Logo;
 import br.com.pdasolucoes.checklist.model.OpcaoResposta;
 import br.com.pdasolucoes.checklist.model.Pergunta;
 import br.com.pdasolucoes.checklist.model.Resposta;
@@ -58,9 +60,6 @@ public class FinalizacaoFormulario {
     private static OpcaoRespostaDao opcaoRespostaDao;
     private static int id;
     private static AlertDialog dialogProgress;
-    private static Handler handler = new Handler();
-    private static int progressStatus = 0;
-    private static int progress;
     private static ProgressBar progressBar;
 
 
@@ -154,10 +153,12 @@ public class FinalizacaoFormulario {
 
         @Override
         protected Object doInBackground(Object[] objects) {
+            ComplementoRespostaDao dao2 = new ComplementoRespostaDao(context);
             if (VerificaConexao.isNetworkConnected(context)) {
                 try {
                     SharedPreferences preferences = context.getSharedPreferences("MainActivityPreferences", context.MODE_PRIVATE);
                     ServiceRespostaPost.postResposta(dao.listarResposta(id, preferences.getInt("idUsuario", 0)));
+                    ServiceComplementoResposta.postResposta(dao2.imagem());
                     ServiceTodoPost.postTodo(todoDao.listarTodo(id));
                     formItemDao.alterarStatusSync(id);
                 } catch (Exception e) {
@@ -203,7 +204,7 @@ public class FinalizacaoFormulario {
                 for (OpcaoResposta op : opcaoRespostaDao.listarTodasOpcoesForm(id, p.getIdPergunta())) {
                     totalTodasPerguntasForm += op.getValor();
                 }
-            } else if (p.getTipoPergunta() == 4) {
+            } else if (p.getTipoPergunta() == 4 || p.getTipoPergunta() == 8) {
                 for (OpcaoResposta op : opcaoRespostaDao.listarTodasOpcoesFormMultiplo(id, p.getIdPergunta())) {
                     totalTodasPerguntasForm += op.getValor();
                 }

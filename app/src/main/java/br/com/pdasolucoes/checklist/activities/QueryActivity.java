@@ -284,7 +284,7 @@ public class QueryActivity extends AppCompatActivity {
                 for (OpcaoResposta op : opcaoRespostaDao.listarTodasOpcoesForm(getIntent().getExtras().getInt("idItem"), p.getIdPergunta())) {
                     totalTodasPerguntasForm += op.getValor();
                 }
-            }else if(p.getTipoPergunta()==4){
+            } else if (p.getTipoPergunta() == 4 || p.getTipoPergunta() == 8) {
                 for (OpcaoResposta op : opcaoRespostaDao.listarTodasOpcoesFormMultiplo(getIntent().getExtras().getInt("idItem"), p.getIdPergunta())) {
                     totalTodasPerguntasForm += op.getValor();
                 }

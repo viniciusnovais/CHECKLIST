@@ -63,6 +63,10 @@
     <string name="nomeSetor">Setor:</string>
     <string name="editar">Editar</string>
     <string name="usuario">USUÁRIO</string>
+    <string name="ok">Ok</string>
+    <string name="sobre">Sobre</string>
+    <string name="atualizar">Atualizar</string>
+    <string name="sair">Sair</string>
 
     <string-array name="status_todo">
         <item>Andamento</item>

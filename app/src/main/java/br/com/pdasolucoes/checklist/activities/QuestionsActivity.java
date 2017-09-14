@@ -18,6 +18,7 @@ import android.support.v7.widget.LinearLayoutManager;
 
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 
 import android.widget.EditText;
@@ -85,7 +86,7 @@ public class QuestionsActivity extends AppCompatActivity {
     final ComponenteResposta cr = new ComponenteResposta();
     private LinearLayout ll;
     private AlertDialog dialogProgress;
-    private ProgressBar progressBar,progressBarQuestao;
+    private ProgressBar progressBar, progressBarQuestao;
     private byte[] imageByte;
 
     @Override
@@ -351,7 +352,7 @@ public class QuestionsActivity extends AppCompatActivity {
                     photo = (Bitmap) data.getExtras().get("data");
                     originalBitmap = photo;
                     resizedBitmap = Bitmap.createScaledBitmap(
-                            originalBitmap, 530, 530, false);
+                            originalBitmap, photo.getWidth() * 3, photo.getHeight() * 3, false);
 
 
                     imageByte = getBitmapAsByteArray(originalBitmap);
@@ -359,7 +360,7 @@ public class QuestionsActivity extends AppCompatActivity {
 
                     dialog = builder.create();
                     dialog.show();
-                    dialog.getWindow().setLayout(700, 800);
+
                     break;
                 //Trazer imagem da galeria e colocar no dialog
 
@@ -367,7 +368,7 @@ public class QuestionsActivity extends AppCompatActivity {
                     photo = (Bitmap) data.getExtras().get("data");
                     originalBitmap = photo;
                     resizedBitmap = Bitmap.createScaledBitmap(
-                            originalBitmap, 530, 530, false);
+                            originalBitmap, photo.getWidth() * 3, photo.getHeight() * 3, false);
 
                     imageByte = getBitmapAsByteArray(originalBitmap);
 
@@ -375,7 +376,6 @@ public class QuestionsActivity extends AppCompatActivity {
 
                     dialog = builder.create();
                     dialog.show();
-                    dialog.getWindow().setLayout(700, 800);
                     break;
                 case GALERIA:
                     String[] colunaCaminhoArquivo = {MediaStore.Images.Media.DATA};
@@ -392,7 +392,7 @@ public class QuestionsActivity extends AppCompatActivity {
                         photo = MediaStore.Images.Media.getBitmap(getContentResolver(), uriImagem);
                         originalBitmap = photo;
                         resizedBitmap = Bitmap.createScaledBitmap(
-                                originalBitmap, 530, 530, false);
+                                originalBitmap, photo.getWidth() * 3, photo.getHeight() * 3, false);
                         image.setImageBitmap(resizedBitmap);
 
                         imageByte = getBitmapAsByteArray(originalBitmap);
@@ -400,7 +400,6 @@ public class QuestionsActivity extends AppCompatActivity {
 
                         dialog = builder.create();
                         dialog.show();
-                        dialog.getWindow().setLayout(700, 800);
                     } catch (Exception e) {
                     }
                     break;
@@ -420,13 +419,12 @@ public class QuestionsActivity extends AppCompatActivity {
                         photo = MediaStore.Images.Media.getBitmap(getContentResolver(), uriImagem);
                         originalBitmap = photo;
                         resizedBitmap = Bitmap.createScaledBitmap(
-                                originalBitmap, 530, 530, false);
+                                originalBitmap, photo.getWidth() * 3, photo.getHeight() * 3, false);
                         image.setImageBitmap(resizedBitmap);
                         complementoTodoDao.incluir(ct);
 
                         dialog = builder.create();
                         dialog.show();
-                        dialog.getWindow().setLayout(700, 800);
                     } catch (Exception e) {
                     }
                     break;
@@ -457,6 +455,8 @@ public class QuestionsActivity extends AppCompatActivity {
                     ct.setIdTodo(daoTodo.ultimoId() + 1);
 
                     complementoTodoDao.incluir(ct);
+
+                    CriaTodo.atualizaNotificacoesTempoRealCamera(QuestionsActivity.this, IDFORMITEM, IDPERGUNTA);
                 } else {
                     cr.setImage(imageByte);
                     cr.setIdPergunta(adapter.getItem(POSITION).getIdPergunta());
@@ -466,7 +466,6 @@ public class QuestionsActivity extends AppCompatActivity {
 
                 }
 
-                CriaTodo.atualizaNotificacoesTempoRealCamera(QuestionsActivity.this, IDFORMITEM, IDPERGUNTA);
 
                 if (getIntent().hasExtra("QueryActivity")) {
                     if (complementoRespostaDao.contadorImagens(getIntent().getExtras().getInt("ItemId")) > 0) {
@@ -507,10 +506,10 @@ public class QuestionsActivity extends AppCompatActivity {
 
         @Override
         protected Integer doInBackground(Objects... objectses) {
-            if (!getIntent().hasExtra("QueryActivity")) {
-                if (VerificaConexao.isNetworkConnected(QuestionsActivity.this)) {
-                }
-            }
+//            if (!getIntent().hasExtra("QueryActivity")) {
+//                if (VerificaConexao.isNetworkConnected(QuestionsActivity.this)) {
+//                }
+//            }
 
             return 1;
         }

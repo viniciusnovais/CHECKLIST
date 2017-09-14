@@ -51,6 +51,24 @@ public class ComplementoRespostaDao {
 
     }
 
+    public byte[] imagem() {
+
+        Cursor cursor = getDataBase().rawQuery("SELECT image FROM complementoResposta", null);
+        ComplementoResposta c = new ComplementoResposta();
+        try {
+            while (cursor.moveToNext()) {
+
+                c.setImage(cursor.getBlob(cursor.getColumnIndex("image")));
+
+
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return c.getImage();
+    }
+
     public List<ComplementoResposta> listar(int idFormItem) {
         List<ComplementoResposta> lista = new ArrayList<>();
         Cursor cursor = getDataBase().rawQuery("SELECT * FROM complementoResposta cr WHERE cr.idFormItem = ? GROUP BY cr.idPergunta", new String[]{idFormItem + ""});

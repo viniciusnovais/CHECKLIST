@@ -12,6 +12,7 @@ public class OpcaoResposta {
     private float percentual;
     private float maior;
     private float menor;
+    private float valorDiferente;
     private float valor;
     private int toDo;
     private String horaMaior;
@@ -131,5 +132,13 @@ public class OpcaoResposta {
 
     public void setToDo(int toDo) {
         this.toDo = toDo;
+    }
+
+    public float getValorDiferente() {
+        return valorDiferente;
+    }
+
+    public void setValorDiferente(float valorDiferente) {
+        this.valorDiferente = valorDiferente;
     }
 }

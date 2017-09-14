@@ -34,7 +34,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 "data TEXT, follow TEXT, idPergunta INTEGER, idFormItem INTEGER, idResposta INTEGER)");
 
         db.execSQL("CREATE TABLE if not exists opcaoQuestao(_idOpcao INTEGER, opcao TEXT,idPergunta INTEGER, percentual REAL, maior REAL, menor REAL," +
-                " valor REAL, horaMaior TEXT, horaMenor TEXT, dataMaior, dataMenor TEXT, todo INTEGER)");
+                " valor REAL, horaMaior TEXT, horaMenor TEXT, dataMaior, dataMenor TEXT, todo INTEGER, valorDiferente REAL)");
 
         db.execSQL("CREATE TABLE if not exists setor(id INTEGER, nome TEXT, idForm INTEGER, status INTEGER)");
 

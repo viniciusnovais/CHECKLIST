@@ -14,7 +14,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="start"
-            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
             android:src="@mipmap/no_photo" />
     </LinearLayout>
 
@@ -36,17 +36,17 @@
     </LinearLayout>
 
     <!--<LinearLayout-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_weight=".15">-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_weight=".15">-->
 
-        <!--<ImageView-->
-            <!--android:layout_width="50dp"-->
-            <!--android:layout_height="50dp"-->
-            <!--android:layout_gravity="start"-->
-            <!--android:paddingRight="10dp"-->
-            <!--android:src="@mipmap/no_photo"-->
-            <!--android:visibility="gone" />-->
+    <!--<ImageView-->
+    <!--android:layout_width="50dp"-->
+    <!--android:layout_height="50dp"-->
+    <!--android:layout_gravity="start"-->
+    <!--android:paddingRight="10dp"-->
+    <!--android:src="@mipmap/no_photo"-->
+    <!--android:visibility="gone" />-->
     <!--</LinearLayout>-->
 
 </LinearLayout>

@@ -47,7 +47,7 @@ public class ServiceVerificaForm {
             // Get the response
             response = (SoapObject) envelope.bodyIn;
 
-            status = Integer.parseInt(response.getProperty("setFormAlteradoResult").toString());
+            status = Integer.parseInt(response.getProperty("int").toString());
 
         } catch (Exception e) {
             //Assign Error Status true in static variable 'errored'

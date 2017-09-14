@@ -265,6 +265,11 @@ public class CriaTodo {
                     t.setIdPergunta(idPergunta);
                     t.setIdFormItem(idFormItem);
 
+                    //uso isso, pq quando a questão é de checkbox, radiobutton ou lista, eu salvo durante a resposta do usuário e
+                    // assim ja obtenho o idResposta imediatamente.
+                    //Quando é de outro tipo eu salvo na troca de questão, e como o usuário ainda estaria na questão
+                    // eu ainda não teria esse id, por isso eu preciso de id "falso"
+                    //para salvar o todo.
                     if (tipo > 2) {
                         int idResposta1 = respostaDao.buscarIdUltimaResposta() + 1;
                         t.setIdResposta(idResposta1);

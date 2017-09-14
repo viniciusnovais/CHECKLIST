@@ -14,7 +14,7 @@
             android:id="@+id/logo_cliente"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
             android:layout_gravity="start"
             android:src="@mipmap/no_photo" />
     </LinearLayout>
@@ -36,12 +36,13 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:gravity="end"
         android:layout_weight=".15">
 
     <ImageView
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_gravity="end"
+        android:gravity="end"
         android:paddingRight="10dp"
         android:src="@mipmap/logo" />
         </LinearLayout>

@@ -59,6 +59,7 @@ public class HomeActivity extends AbsRuntimePermission implements View.OnClickLi
     private ImageButton imageBtnAppointment, imageBtnstart, imageBtnTodo, imageBtnSinc, imageBtnQuery, imageBtnLogout;
     private TextView tvWelcome, tvContadorAgenda, tvContadorTodo, tvContadorConsulta, tvContadorSync;
     public static final int REQUEST_PERMISSION = 10;
+    private int ATUALIZA = 0;
     private FormDao formDao;
     private FormDao dao = new FormDao(this);
     private PerguntaDao perguntaDao = new PerguntaDao(this);
@@ -190,6 +191,7 @@ public class HomeActivity extends AbsRuntimePermission implements View.OnClickLi
         imageBtnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(HomeActivity.this, "Logo teremos esse módulo", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -219,6 +221,13 @@ public class HomeActivity extends AbsRuntimePermission implements View.OnClickLi
                 break;
             case R.id.btSobre:
                 Toast.makeText(HomeActivity.this, "Logo teremos esse serviço pronto", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.btAtualizar:
+                deletarTodos();
+                ATUALIZA = 1;
+                AsyncReceberDados task = new AsyncReceberDados();
+                task.execute();
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -252,12 +261,16 @@ public class HomeActivity extends AbsRuntimePermission implements View.OnClickLi
         protected void onPreExecute() {
             super.onPreExecute();
             progressDialog = new ProgressDialog(HomeActivity.this);
-            progressDialog.setMessage("Importando Dados...");
-            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressDialog.setIndeterminate(false);
-            progressDialog.setCanceledOnTouchOutside(true);
-            progressDialog.setCancelable(false);
-            progressDialog.show();
+            if (VerificaConexao.isNetworkConnected(HomeActivity.this)) {
+                if (getIntent().hasExtra("primeiravez") || ATUALIZA == 1) {
+                    progressDialog.setMessage("Importando Dados...");
+                    progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    progressDialog.setIndeterminate(false);
+                    progressDialog.setCanceledOnTouchOutside(true);
+                    progressDialog.setCancelable(false);
+                    progressDialog.show();
+                }
+            }
         }
 
         @Override
@@ -265,13 +278,14 @@ public class HomeActivity extends AbsRuntimePermission implements View.OnClickLi
 
             //pegando Formulários
             if (VerificaConexao.isNetworkConnected(HomeActivity.this)) {
-                if (getIntent().hasExtra("primeiravez")) {
+                if (getIntent().hasExtra("primeiravez") || ATUALIZA == 1) {
+                    deletarTodos();
                     listForm = dao.listarForms(preferences.getInt("idConta", 0));
                     totalSize = listForm.size();
                     listaInt = new ArrayList<>();
                     cnt = 1;
                     for (Form f : listForm) {
-                        ServiceVerificaForm.verifica(f.getIdForm());
+
                         listaInt.add(f.getIdForm());
                         listaSetor = setorDao.listaWeb(f.getIdForm());
                         setorDao.incluir(listaSetor);
@@ -303,6 +317,8 @@ public class HomeActivity extends AbsRuntimePermission implements View.OnClickLi
 
                 }
             }
+
+            //onResume();
             return null;
         }
 
@@ -319,6 +335,19 @@ public class HomeActivity extends AbsRuntimePermission implements View.OnClickLi
             progressDialog.dismiss();
             onResume();
         }
+    }
+
+    public void deletarTodos() {
+        FormDao formDao = new FormDao(this);
+        OpcaoRespostaDao opcaoRespostaDao = new OpcaoRespostaDao(this);
+        PerguntaDao perguntaDao = new PerguntaDao(this);
+        FormItemDao formItemDao = new FormItemDao(this);
+
+        formDao.deletar();
+        perguntaDao.deletar();
+        opcaoRespostaDao.deletar();
+        formItemDao.deletar();
+
     }
 
 }
