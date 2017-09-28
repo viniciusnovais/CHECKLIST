@@ -57,6 +57,18 @@ public class RespostaDao {
         return getDataBase().insert("resposta", null, values);
     }
 
+    public long incluirRespostaLista(Resposta resposta) {
+        ContentValues values = new ContentValues();
+
+        values.put("txtResposta", resposta.getTxtResposta());
+        values.put("idPergunta", resposta.getIdPergunta());
+        values.put("idFormItem", resposta.getIdFormItem());
+        values.put("idOpcao", resposta.getIdOpcao());
+        values.put("valor", resposta.getValor());
+
+        return getDataBase().insert("resposta", null, values);
+    }
+
     public void deleteOpcaoResposta(int idResposta) {
         getDataBase().delete("resposta", "_idResposta" + "=" + idResposta, null);
     }
@@ -71,9 +83,25 @@ public class RespostaDao {
         getDataBase().update("resposta", values, "_idResposta=?", new String[]{resposta.getIdResposta() + ""});
     }
 
+    //tive que criar um exclusivo pra lista, pra resolver o problema do todo, nele eu faço a alteração diferente
+    public void alterarRespostaLista(Resposta resposta) {
+        ContentValues values = new ContentValues();
+        values.put("txtResposta", resposta.getTxtResposta());
+        values.put("valor", resposta.getValor());
+        values.put("idOpcao", resposta.getIdOpcao());
+
+        getDataBase().update("resposta", values, "_idResposta=?", new String[]{resposta.getIdResposta() + ""});
+    }
+
     public void isTodo(int idResposta) {
         ContentValues values = new ContentValues();
         values.put("todo", 1);
+        getDataBase().update("resposta", values, "_idResposta = " + idResposta, null);
+    }
+
+    public void isNotTodo(int idResposta) {
+        ContentValues values = new ContentValues();
+        values.put("todo", 0);
         getDataBase().update("resposta", values, "_idResposta = " + idResposta, null);
     }
 

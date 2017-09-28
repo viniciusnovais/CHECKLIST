@@ -192,7 +192,8 @@ public class Question2Adapter extends RecyclerView.Adapter<Question2Adapter.MyVi
                             myViewHolder.editTextHora, listaPergunta.get(position).getOpcaoQuestaoTodo(),
                             daoOpResposta.listar(idPergunta), idFormItem, getItemCount(), cntqestoes, idPergunta));
 
-        } else if (listaPergunta.get(position).getTipoPergunta() == 6) {
+        //avaliação
+        } else if (listaPergunta.get(position).getTipoPergunta() == 9) {
             idPergunta = listaPergunta.get(position).getIdPergunta();
             myViewHolder.rating = new RatingBar(context);
             cntqestoes = position;

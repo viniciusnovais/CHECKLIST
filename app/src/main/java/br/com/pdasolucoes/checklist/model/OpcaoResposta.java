@@ -15,6 +15,7 @@ public class OpcaoResposta {
     private float valorDiferente;
     private float valor;
     private int toDo;
+    private String tipoCondicao;
     private String horaMaior;
     private String horaMenor;
     private String dataMenor;
@@ -140,5 +141,13 @@ public class OpcaoResposta {
 
     public void setValorDiferente(float valorDiferente) {
         this.valorDiferente = valorDiferente;
+    }
+
+    public String getTipoCondicao() {
+        return tipoCondicao;
+    }
+
+    public void setTipoCondicao(String tipoCondicao) {
+        this.tipoCondicao = tipoCondicao;
     }
 }

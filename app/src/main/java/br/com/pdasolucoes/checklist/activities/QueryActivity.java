@@ -135,7 +135,16 @@ public class QueryActivity extends AppCompatActivity {
         long diffHoras = resultado / hours;
         long diffHorasMinutos = (resultado % hours) / (60 * 1000);
 
-        tvTempo.setText("Tempo: " + diffHoras + " horas e " + diffHorasMinutos + " minutos");
+//        if (!formItemDao.listarItemForm(getIntent().getExtras().getInt("idItem")).get(0).getHoraFim().equals("")) {
+//            String hora = formItemDao.listarItemForm(getIntent().getExtras().getInt("idItem")).get(0).getHoraFim();
+//            if (Integer.parseInt(hora.substring(0, 1)) < 9) {
+//                hora = "0" + hora;
+//            }
+//            tvTempo.setText("Tempo: " + hora.substring(0, 2) + " horas e " + hora.substring(2, 4) + " minutos");
+//        } else {
+
+            tvTempo.setText("Tempo: " + diffHoras + " horas e " + diffHorasMinutos + " minutos");
+        //}
 
         mChart = (PieChart) findViewById(R.id.chart);
         createPie(mChart);

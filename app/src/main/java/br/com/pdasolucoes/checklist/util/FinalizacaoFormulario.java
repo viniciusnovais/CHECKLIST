@@ -24,6 +24,8 @@ import com.plattysoft.leonids.ParticleSystem;
 
 import org.json.JSONException;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import br.com.pdasolucoes.checklist.activities.HomeActivity;
@@ -37,6 +39,7 @@ import br.com.pdasolucoes.checklist.dao.PerguntaDao;
 import br.com.pdasolucoes.checklist.dao.RespostaDao;
 import br.com.pdasolucoes.checklist.dao.TodoDao;
 import br.com.pdasolucoes.checklist.model.ComplementoResposta;
+import br.com.pdasolucoes.checklist.model.FormItem;
 import br.com.pdasolucoes.checklist.model.Logo;
 import br.com.pdasolucoes.checklist.model.OpcaoResposta;
 import br.com.pdasolucoes.checklist.model.Pergunta;
@@ -125,6 +128,15 @@ public class FinalizacaoFormulario {
 
 
                     } else {
+                        FormItem f = new FormItem();
+                        Calendar c = Calendar.getInstance();
+                        c.setTime(new Date());
+                        String data = c.get(Calendar.DAY_OF_MONTH) + "/" + c.get(Calendar.MONTH) + "/" + c.get(Calendar.YEAR);
+                        String hora = c.get(Calendar.HOUR) + ":" + c.get(Calendar.MINUTE);
+                        f.setIdItem(id);
+                        f.setDataFim(data);
+                        f.setHoraFim(hora);
+                        formItemDao.alterarDataHoraFim(f);
                         Toast.makeText(context, "Finalizando formulário...", Toast.LENGTH_SHORT).show();
                         AsyncEnviarResposta task = new AsyncEnviarResposta();
                         task.execute();

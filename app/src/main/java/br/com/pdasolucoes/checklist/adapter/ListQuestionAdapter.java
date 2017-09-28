@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.math.BigDecimal;
+import java.security.acl.NotOwnerException;
 import java.util.List;
 
 import br.com.pdasolucoes.checklist.activities.QuestionsActivity;
@@ -33,6 +34,7 @@ public class ListQuestionAdapter extends RecyclerView.Adapter<ListQuestionAdapte
     private static ChangePosition changePosition;
     private int idFormItem;
     private RespostaDao daoResposta;
+    private static NotTodo notTodo;
     private CriaTodo criaTodo;
 
 
@@ -58,6 +60,14 @@ public class ListQuestionAdapter extends RecyclerView.Adapter<ListQuestionAdapte
 
     public void setCriaTodo(CriaTodo criaTodo) {
         this.criaTodo = criaTodo;
+    }
+
+    public interface NotTodo {
+        void onItemNotTodo(boolean not, int position);
+    }
+
+    public void setNotTodo(NotTodo notTodo) {
+        this.notTodo = notTodo;
     }
 
 
@@ -113,8 +123,8 @@ public class ListQuestionAdapter extends RecyclerView.Adapter<ListQuestionAdapte
                 try {
                     if (!holder.editText.getText().toString().equals("")) {
                         op.setTxtResposta(holder.editText.getText().toString());
-                        itemChangeListener.onItemClick(position, new BigDecimal(String.valueOf(op.getTxtResposta())));
                         VerificaoTodo(holder.imageView, op, position);
+                        itemChangeListener.onItemClick(position, new BigDecimal(String.valueOf(op.getTxtResposta())));
                     }
 
                 } catch (NumberFormatException e) {
@@ -155,52 +165,61 @@ public class ListQuestionAdapter extends RecyclerView.Adapter<ListQuestionAdapte
 
     public void VerificaoTodo(ImageView imageView, OpcaoResposta op, final int position) {
         if (!op.getTxtResposta().toString().equals("")) {
-//            if (!(op.getMaior() < Float.parseFloat(op.getTxtResposta().toString()))
-//                    && op.getToDo() == 1) {
-//                holder.imageView.setImageResource(R.drawable.todo_48);
-//                holder.imageView.setEnabled(true);
-//                holder.imageView.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        int idResposta = daoResposta.buscarIdResposta(idFormItem, op.getIdPergunta(), op.getIdOpcao());
-//                        CriaTodo.criaTodo(context, op.getIdPergunta(), idFormItem, idResposta, 1);
-//                    }
-//                });
-//            } else {
-//                holder.imageView.setImageResource(R.drawable.todo_48_gray);
-//                holder.imageView.setEnabled(true);
-//            }
+            if (op.getTipoCondicao().equals("intervalo")) {
+                if (!(Float.parseFloat(op.getTxtResposta().toString()) >= op.getMaior() &&
+                        Float.parseFloat(op.getTxtResposta().toString()) <= op.getMenor())
+                        && op.getToDo() == 1) {
+                    imageView.setImageResource(R.drawable.todo_48);
+                    imageView.setEnabled(true);
+                    notTodo.onItemNotTodo(false,position);
+                    imageView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            criaTodo.onItemCriaTodo(true, position);
+                        }
+                    });
+                } else {
+                    notTodo.onItemNotTodo(true,position);
+                    imageView.setImageResource(R.drawable.todo_48_gray);
+                    imageView.setEnabled(true);
+                }
+            } else if (op.getTipoCondicao().equals("maior")) {
+                if (!(op.getMaior() <= Float.parseFloat(op.getTxtResposta().toString()))
+                        && op.getToDo() == 1) {
+                    notTodo.onItemNotTodo(false,position);
+                    imageView.setImageResource(R.drawable.todo_48);
+                    imageView.setEnabled(true);
+                    imageView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            criaTodo.onItemCriaTodo(true, position);
+                        }
+                    });
+                } else {
+                    notTodo.onItemNotTodo(true,position);
+                    imageView.setImageResource(R.drawable.todo_48_gray);
+                    imageView.setEnabled(true);
+                }
+            } else if (op.getTipoCondicao().equals("menor")) {
 
-            if (!(Float.parseFloat(op.getTxtResposta().toString()) > op.getMaior() && Float.parseFloat(op.getTxtResposta().toString()) < op.getMenor())
-                    && op.getToDo() == 1) {
-                imageView.setImageResource(R.drawable.todo_48);
-                imageView.setEnabled(true);
-                imageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        criaTodo.onItemCriaTodo(true, position);
-                    }
-                });
-            } else {
-                imageView.setImageResource(R.drawable.todo_48_gray);
-                imageView.setEnabled(true);
+                if (!(op.getMenor() >= Float.parseFloat(op.getTxtResposta().toString()))
+                        && op.getToDo() == 1) {
+                    notTodo.onItemNotTodo(false,position);
+                    imageView.setImageResource(R.drawable.todo_48);
+                    imageView.setEnabled(true);
+                    imageView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            criaTodo.onItemCriaTodo(true, position);
+                        }
+                    });
+                } else {
+                    notTodo.onItemNotTodo(true,position);
+                    imageView.setImageResource(R.drawable.todo_48_gray);
+                    imageView.setEnabled(true);
+                }
             }
 
-//            if (!(op.getMenor() > Float.parseFloat(op.getTxtResposta().toString()))
-//                    && op.getToDo() == 1) {
-//                holder.imageView.setImageResource(R.drawable.todo_48);
-//                holder.imageView.setEnabled(true);
-//                holder.imageView.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        int idResposta = daoResposta.buscarIdResposta(idFormItem, op.getIdPergunta(), op.getIdOpcao());
-//                        CriaTodo.criaTodo(context, op.getIdPergunta(), idFormItem, idResposta, 1);
-//                    }
-//                });
-//            } else {
-//                holder.imageView.setImageResource(R.drawable.todo_48_gray);
-//                holder.imageView.setEnabled(true);
-//            }
         }
     }
 }

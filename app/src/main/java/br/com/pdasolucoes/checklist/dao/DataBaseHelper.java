@@ -16,7 +16,7 @@ import java.util.List;
 public class DataBaseHelper extends SQLiteOpenHelper {
 
     private static final String BANCO_DADOS = "forms";
-    private static final int VERSAO = 6;
+    private static final int VERSAO = 7;
 
 
     public DataBaseHelper(Context context) {
@@ -34,7 +34,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 "data TEXT, follow TEXT, idPergunta INTEGER, idFormItem INTEGER, idResposta INTEGER)");
 
         db.execSQL("CREATE TABLE if not exists opcaoQuestao(_idOpcao INTEGER, opcao TEXT,idPergunta INTEGER, percentual REAL, maior REAL, menor REAL," +
-                " valor REAL, horaMaior TEXT, horaMenor TEXT, dataMaior, dataMenor TEXT, todo INTEGER, valorDiferente REAL)");
+                " valor REAL, horaMaior TEXT, horaMenor TEXT, dataMaior, dataMenor TEXT, todo INTEGER, valorDiferente REAL, tipoCondicao TEXT)");
 
         db.execSQL("CREATE TABLE if not exists setor(id INTEGER, nome TEXT, idForm INTEGER, status INTEGER)");
 

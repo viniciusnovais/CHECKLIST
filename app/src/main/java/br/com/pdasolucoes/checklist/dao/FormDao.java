@@ -119,7 +119,7 @@ public class FormDao {
         getDataBase().execSQL(String.format("DELETE FROM form WHERE _idForm NOT IN (%s)", args));
     }
 
-    public void deletar(){
+    public void deletar() {
         getDataBase().execSQL("DELETE FROM form");
     }
 
@@ -132,56 +132,27 @@ public class FormDao {
         return cnt;
     }
 
-//    public List<Form> getFormWS() {
-//        List<Form> l = new ArrayList<>();
-//        String url = WebService.URL;
-//        String resposta = WebService.makeRequest(url);
-//        if (resposta == null) {
-//            error = true;
-//        } else {
-//
-//            try {
-//                JSONArray array = new JSONArray(resposta);
-//                for (int i = 0; i < array.length(); i++) {
-//                    JSONObject json = array.getJSONObject(i);
-//
-//                    Form f = new Form();
-//                    f.setIdForm(json.getInt("idForm"));
-//                    f.setNomeFom(json.getString("nomeForm"));
-//                    f.setDataForm(json.getString("dataForm"));
-//                    f.setNomeLoja(json.getString("nomeLoja"));
-//                    f.setStatus(json.getInt("status"));
-//                    //f.setHora(json.getInt("hora"));
-//
-//                    //incluir(f);
-//                    l.add(f);
-//                }
-//
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        return l;
-//    }
-
     private static String URL = "http://179.184.159.52/wsforms/wsform.asmx";
 
-    private static String SOAP_ACTION = "http://tempuri.org/GetFormConta";
+    private static String SOAP_ACTION = "http://tempuri.org/GetForms";
 
     private static String NAMESPACE = "http://tempuri.org/";
+    private static String SOAP_ACTION2 = "http://tempuri.org/setFormAlterado";
 
-    public List<Form> listarForms(int idConta) {
+    private static String NAMESPACE2 = "http://tempuri.org/";
+
+    public List<Form> listarForms(int idUsuario) {
         List<Form> lista = new ArrayList<>();
 
         SoapObject response;
         // Create request
-        SoapObject request = new SoapObject(NAMESPACE, "GetFormConta");
+        SoapObject request = new SoapObject(NAMESPACE, "GetForms");
         // Property which holds input parameters
         PropertyInfo unamePI = new PropertyInfo();
         // Set Username
-        unamePI.setName("idConta");
+        unamePI.setName("idUsuario");
         // Set Value
-        unamePI.setValue(idConta);
+        unamePI.setValue(idUsuario);
         // Set dataType
         unamePI.setType(String.class);
 
@@ -208,13 +179,22 @@ public class FormDao {
                 itemResponse = (SoapObject) response.getProperty(j);
 
                 Form f = new Form();
-
+                //if (Integer.parseInt(itemResponse.getProperty("alterado").toString()) == 1) {
+                //delete resposta
+                //deleta item
+                //proprio formulario
+                //delete(id)
+                //insere form
                 f.setIdForm(Integer.parseInt(itemResponse.getProperty("id").toString()));
                 f.setNomeFom(itemResponse.getProperty("nomeForm").toString());
                 f.setDataForm(sdf.format(new Date()));
                 f.setHora(sdfHora.format(new Date()));
                 f.setNomeLoja(itemResponse.getProperty("descricao").toString());
+                f.setAlterado(Integer.parseInt(itemResponse.getProperty("alterado").toString()));
                 f.setStatus(0);
+                //}
+
+                //delete quem não existe
 
                 lista.add(f);
             }
@@ -225,5 +205,34 @@ public class FormDao {
         }
         //Return booleam to calling object
         return lista;
+    }
+
+    public void setFormAlterado(int idForm) {
+        // Create request
+        SoapObject request = new SoapObject(NAMESPACE2, "setFormAlterado");
+        // Property which holds input parameters
+        PropertyInfo unamePI = new PropertyInfo();
+        // Set Username
+        unamePI.setName("id");
+        // Set Value
+        unamePI.setValue(idForm);
+        // Set dataType
+        unamePI.setType(String.class);
+
+        request.addProperty(unamePI);
+        // Create envelope
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+        envelope.dotNet = true;
+        // Set output SOAP object
+        envelope.setOutputSoapObject(request);
+        // Create HTTP call object
+        HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+
+        try {
+            // Invoke web service
+            androidHttpTransport.call(SOAP_ACTION2, envelope);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

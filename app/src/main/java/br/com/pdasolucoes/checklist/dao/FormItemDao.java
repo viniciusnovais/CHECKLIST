@@ -108,6 +108,15 @@ public class FormItemDao {
         return id;
     }
 
+    public void alterarDataHoraFim(FormItem f) {
+        ContentValues values = new ContentValues();
+        values.put("dataFim", f.getDataFim());
+        values.put("horaFim", f.getHoraFim());
+
+
+        getDataBase().update("formItem", values, "_idFormItem = ?", new String[]{f.getIdItem() + ""});
+    }
+
     public List<FormItem> listarItemFormSync() {
         List<FormItem> lista = new ArrayList<>();
         Cursor cursor = getDataBase().rawQuery(
@@ -142,8 +151,18 @@ public class FormItemDao {
         return cnt;
     }
 
+//    public void deletar() {
+//        getDataBase().execSQL("DELETE FROM FORMITEM WHERE IDFORM NOT IN (SELECT _IDFORM FROM FORM)");
+//    }
+
     public void deletar() {
-        getDataBase().execSQL("DELETE FROM FORMITEM WHERE IDFORM NOT IN (SELECT _IDFORM FROM FORM)");
+        getDataBase().execSQL("delete from formItem where idform in (select _idform from form where alterado = 1)");
+    }
+
+    public void alterarAlterado(int idForm) {
+        ContentValues values = new ContentValues();
+        values.put("alterado", 0);
+        getDataBase().update("form", values, "alterado = 1", new String[]{idForm + ""});
     }
 
     public int contadorFormItemConsulta(int idUsuario) {
@@ -181,16 +200,6 @@ public class FormItemDao {
         }
         return id;
     }
-
-//    public int buscarIdForm(int idFormItem) {
-//        int id = 0;
-//        Cursor cursor = getDataBase().rawQuery(
-//                "SELECT idForm FROM formItem WHERE _idFormItem=?", new String[]{idFormItem + ""});
-//        while (cursor.moveToNext()) {
-//            id = cursor.getInt(cursor.getColumnIndex("idForm"));
-//        }
-//        return id;
-//    }
 
     public int buscarMaxId() {
         int id = 0;

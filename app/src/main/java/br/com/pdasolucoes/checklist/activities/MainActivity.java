@@ -155,7 +155,6 @@ public class MainActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putString("email", email);
                     editor.putString("senha", senha);
-                    editor.putInt("idConta", Integer.parseInt(obj.getProperty("idConta").toString()));
                     editor.putInt("idUsuario", Integer.parseInt(obj.getProperty("Codigo").toString()));
                     editor.putString("nome", obj.getProperty("Nome").toString());
                     editor.commit();

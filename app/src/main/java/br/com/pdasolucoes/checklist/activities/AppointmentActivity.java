@@ -41,16 +41,11 @@ public class AppointmentActivity extends AppCompatActivity {
 
     private ListView listView;
     private AppointmentAdapter adapter;
-    private List<Form> listForm;
     private FloatingActionButton fab;
     private FormDao dao = new FormDao(this);
-    private SetorDao setorDao = new SetorDao(this);
-    private List<Setor> listaSetor = new ArrayList<>();
     private TextView tvForm, tvPeriodo;
     private String[] spinnerValuesPeriod = {"Dia", "Semanal", "Quinzenal", "Mensal"};
     private Typeface tf;
-    private List<Integer> listaInt;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +78,15 @@ public class AppointmentActivity extends AppCompatActivity {
         adapterSpinner2.setDropDownViewResource(R.layout.spinner_item);
         mySpinner2.setAdapter(adapterSpinner2);
 
+        adapter = new AppointmentAdapter(dao.listar(), getApplicationContext());
+        listView.setAdapter(adapter);
+
+        Spinner mySpinner = (Spinner) findViewById(R.id.spinnerForm);
+        final ArrayAdapter<String> adapterSpinner = new ArrayAdapter<String>
+                (AppointmentActivity.this, R.layout.custom_spinner, dao.listarForm());
+        adapterSpinner.setDropDownViewResource(R.layout.spinner_item);
+        mySpinner.setAdapter(adapterSpinner);
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -97,54 +101,5 @@ public class AppointmentActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        adapter = new AppointmentAdapter(dao.listar(), getApplicationContext());
-        listView.setAdapter(adapter);
-
-        Spinner mySpinner = (Spinner) findViewById(R.id.spinnerForm);
-        final ArrayAdapter<String> adapterSpinner = new ArrayAdapter<String>
-                (AppointmentActivity.this, R.layout.custom_spinner, dao.listarForm());
-        adapterSpinner.setDropDownViewResource(R.layout.spinner_item);
-        mySpinner.setAdapter(adapterSpinner);
-    }
-
-    public class AsyncForm extends AsyncTask {
-
-        SharedPreferences preferences = getSharedPreferences("MainActivityPreferences", MODE_PRIVATE);
-
-        @Override
-        protected Object doInBackground(Object[] params) {
-
-
-//            if (VerificaConexao.isNetworkConnected(AppointmentActivity.this)) {
-//                listForm = dao.listarForms(preferences.getInt("idUsuario", 0));
-//                listaInt = new ArrayList<>();
-//                for (Form f : listForm) {
-//                    listaInt.add(f.getIdForm());
-//                    listaSetor = setorDao.listaWeb(f.getIdForm());
-//                    setorDao.incluir(listaSetor);
-//                }
-//
-//                dao.deleteForm(listaInt);
-//            } else {
-//                listForm = dao.listar();
-//            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
-
-            //dao.incluir(listForm);
-
-
-
-        }
     }
 }

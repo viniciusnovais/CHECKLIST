@@ -1016,7 +1016,7 @@ public class ComponenteResposta {
         recyclerView.setLayoutManager(ll);
 
 
-        ListQuestionAdapter adapter = new ListQuestionAdapter(opcaoRespostaDao.listarVoltaParaListaItem(idFormItem, idPergunta), context, idFormItem);
+        final ListQuestionAdapter adapter = new ListQuestionAdapter(opcaoRespostaDao.listarVoltaParaListaItem(idFormItem, idPergunta), context, idFormItem);
         recyclerView.setAdapter(adapter);
 
         final RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(context) {
@@ -1041,21 +1041,35 @@ public class ComponenteResposta {
                 resposta.setIdOpcao(opcao.get(position).getIdOpcao());
                 resposta.setTxtResposta(valor.toString());
                 resposta.setValor(opcao.get(position).getValor());
-                resposta.setTodo(opcao.get(position).getToDo());
                 resposta.setIdPergunta(idPergunta);
                 resposta.setIdFormItem(idFormItem);
 
                 idResposta = daoResposta.buscarIdResposta(idFormItem, idPergunta, opcao.get(position).getIdOpcao());
                 if (idResposta <= 0) {
-                    daoResposta.incluirResposta(resposta);
+                    daoResposta.incluirRespostaLista(resposta);
                 } else {
+
                     resposta.setIdResposta(idResposta);
-                    daoResposta.alterarResposta(resposta);
+                    daoResposta.alterarRespostaLista(resposta);
                 }
 
                 pegaQtdeResposta.Pega(daoResposta.contadorResposta(idFormItem));
             }
 
+        });
+
+        //uso essa interface pra caso o cara colocar outra resposta q não for todo
+        //dessa forma não cria uma linha na activity lista todo, quando o cara altera a resposta de todo
+        //para não todo
+        adapter.setNotTodo(new ListQuestionAdapter.NotTodo() {
+            @Override
+            public void onItemNotTodo(boolean not, int position) {
+                if (not) {
+                    daoResposta.isNotTodo(daoResposta.buscarIdResposta(idFormItem, idPergunta, opcao.get(position).getIdOpcao()));
+                }else{
+                    daoResposta.isTodo(daoResposta.buscarIdResposta(idFormItem, idPergunta, opcao.get(position).getIdOpcao()));
+                }
+            }
         });
 
         adapter.setCriaTodo(new ListQuestionAdapter.CriaTodo() {

@@ -280,7 +280,7 @@ public class HomeActivity extends AbsRuntimePermission implements View.OnClickLi
             if (VerificaConexao.isNetworkConnected(HomeActivity.this)) {
                 if (getIntent().hasExtra("primeiravez") || ATUALIZA == 1) {
                     deletarTodos();
-                    listForm = dao.listarForms(preferences.getInt("idConta", 0));
+                    listForm = dao.listarForms(preferences.getInt("idUsuario", 0));
                     totalSize = listForm.size();
                     listaInt = new ArrayList<>();
                     cnt = 1;
@@ -315,10 +315,10 @@ public class HomeActivity extends AbsRuntimePermission implements View.OnClickLi
                         }
                     }
 
+                    //esse deletar vai ser utilizado quando eu souber, se o usuário atualizou os forms
+//                    formItemDao.deletar();
                 }
             }
-
-            //onResume();
             return null;
         }
 
@@ -341,13 +341,9 @@ public class HomeActivity extends AbsRuntimePermission implements View.OnClickLi
         FormDao formDao = new FormDao(this);
         OpcaoRespostaDao opcaoRespostaDao = new OpcaoRespostaDao(this);
         PerguntaDao perguntaDao = new PerguntaDao(this);
-        FormItemDao formItemDao = new FormItemDao(this);
 
         formDao.deletar();
         perguntaDao.deletar();
         opcaoRespostaDao.deletar();
-        formItemDao.deletar();
-
     }
-
 }
